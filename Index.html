@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b2545">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SurVial">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="apple-touch-icon" href="assets/logo.png">
+<link rel="manifest" href="manifest.json">
+<title>SurVial Gestión</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --navy:#0b2545;--navy2:#13315c;--blue:#1b6ec2;--sky:#38b6ff;--sky2:#e6f4ff;
+  --bg:#f3f6fb;--card:#fff;--line:#e2e8f0;--tx:#1e293b;--mut:#64748b;
+  --ok:#0f9d6b;--okbg:#e3f8ef;--warn:#b86e00;--warnbg:#fff3d6;--err:#d92d4b;--errbg:#fdecef;
+  --r:14px;--sh:0 1px 2px rgba(11,37,69,.06),0 6px 20px rgba(11,37,69,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Inter,"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body.noscroll{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0;color:var(--navy)}
+.ico{width:1.15em;height:1.15em;flex:none;vertical-align:-.2em}
+.muted{color:var(--mut)}
+[hidden]{display:none!important}
+
+/* Logo oficial: respeta proporciones con object-fit: contain */
+.brand-logo-wrap{width:54px;height:54px;border-radius:14px;background:#091e38;padding:4px;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 6px 16px rgba(0,0,0,.22);overflow:hidden;border:1px solid rgba(255,255,255,.14)}
+.brand-logo-img{width:100%;height:100%;object-fit:contain;display:block}
+.brand-logo-fallback{width:100%;height:100%;border-radius:10px;background:linear-gradient(135deg,var(--sky),#1b6ec2);display:grid;place-items:center;color:#fff;font-weight:800;font-size:17px;letter-spacing:-.5px}
+.boot-logo-wrap{width:168px;height:168px;border-radius:24px;background:#091e38;padding:10px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;box-shadow:0 14px 36px rgba(0,0,0,.35);overflow:hidden;border:1px solid rgba(255,255,255,.16)}
+.boot-logo-wrap .brand-logo-fallback{font-size:40px}
+.topbar-logo-wrap{width:40px;height:40px;border-radius:10px;background:#091e38;padding:3px;display:flex;align-items:center;justify-content:center;flex:none;border:1px solid var(--line);box-shadow:0 2px 6px rgba(11,37,69,.08);overflow:hidden}
+.topbar-logo-wrap .brand-logo-fallback{font-size:12px}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+.sidebar{position:fixed;inset:0 auto 0 0;width:264px;background:linear-gradient(180deg,var(--navy) 0%,var(--navy2) 100%);color:#cfe3f7;display:flex;flex-direction:column;padding:22px 16px;z-index:60;transition:transform .25s}
+.brand{display:flex;align-items:center;gap:12px;padding:4px 8px 22px}
+.brand-name{color:#fff;font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1.05}
+.brand-name span{display:block;color:var(--sky);font-weight:600;font-size:12px;letter-spacing:2.4px;text-transform:uppercase;margin-top:3px}
+.nav{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:0;border-radius:12px;background:transparent;color:#b8d2ec;font-weight:600;cursor:pointer;text-align:left;transition:.15s}
+.nav button:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav button.active{background:rgba(56,182,255,.18);color:#fff;box-shadow:inset 3px 0 0 var(--sky)}
+.nav .ico{font-size:19px}
+.side-foot{margin-top:auto;padding:14px 10px 0;border-top:1px solid rgba(255,255,255,.1);font-size:13px;color:#8fb0d1}
+.side-foot b{display:block;color:#fff;font-weight:600;margin-bottom:2px;word-break:break-word}
+.side-foot button{margin-top:10px;background:rgba(255,255,255,.08);border:0;color:#d6e8fa;border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:600;width:100%}
+.side-foot button:hover{background:rgba(255,255,255,.16)}
+.backdrop{position:fixed;inset:0;background:rgba(8,20,40,.5);z-index:55;display:none}
+.main{margin-left:264px;flex:1;min-width:0}
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;padding:14px 28px;background:rgba(243,246,251,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topbar h2{font-size:18px}
+.topbar .date{margin-left:auto;color:var(--mut);font-size:13px;text-transform:capitalize}
+.burger{display:none;border:0;background:#fff;border-radius:10px;padding:9px;box-shadow:var(--sh);cursor:pointer;color:var(--navy)}
+.content{padding:26px 28px 60px;max-width:1280px;margin:0 auto}
+.view{display:none;animation:fade .25s}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page-head{margin-bottom:20px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.page-head h1{font-size:26px;letter-spacing:-.5px}
+.page-head p{margin:4px 0 0;color:var(--mut)}
+
+/* Cards */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:20px;border:1px solid rgba(226,232,240,.6)}
+.card h3{font-size:16px;margin-bottom:14px}
+.grid{display:grid;gap:16px}
+.stats{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:18px}
+.charts{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:18px}
+.chart-wide{grid-column:1/-1}
+.stat{display:flex;align-items:center;gap:14px;padding:18px}
+.stat .ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:var(--sky2);color:var(--blue);flex:none}
+.stat.ok .ic{background:var(--okbg);color:var(--ok)}
+.stat.warn .ic{background:var(--warnbg);color:var(--warn)}
+.stat .lb{font-size:13px;color:var(--mut);font-weight:600}
+.stat .vl{font-size:24px;font-weight:800;color:var(--navy);letter-spacing:-.5px;line-height:1.15;word-break:break-word}
+.chart-box{position:relative;height:280px}
+.vacio-msg{display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:var(--mut);font-size:14px;text-align:center}
+.chart-box.vacio canvas{visibility:hidden}.chart-box.vacio .vacio-msg{display:flex}
+.activity{list-style:none;margin:0;padding:0}
+.activity li{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.activity li:last-child{border:0}
+.activity .dot{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--sky2);color:var(--blue);flex:none}
+.activity .dot.evento{background:#eef2ff;color:#4338ca}
+.activity .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.activity .w{color:var(--mut);font-size:12.5px;white-space:nowrap}
+
+/* Forms */
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label,.lbl{font-size:13px;font-weight:600;color:var(--navy2)}
+.field label i{color:var(--err);font-style:normal}
+.input,.select,.textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;background:#fff;outline:none;transition:.15s}
+.textarea{min-height:92px;resize:vertical}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--sky);box-shadow:0 0 0 4px rgba(56,182,255,.18)}
+.field.invalid .input,.field.invalid .select,.field.invalid .textarea{border-color:var(--err);background:#fffafb}
+.err{color:var(--err);font-size:12.5px;min-height:0}
+.hint{color:var(--mut);font-size:12.5px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg label{flex:1;min-width:110px;cursor:pointer}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border:1.5px solid var(--line);border-radius:11px;font-weight:700;color:var(--mut);transition:.15s;background:#fff}
+.seg input:focus-visible+span{box-shadow:0 0 0 4px rgba(56,182,255,.25)}
+.seg input:checked+span.ok{border-color:var(--ok);background:var(--okbg);color:var(--ok)}
+.seg input:checked+span.warn{border-color:#e8a21a;background:var(--warnbg);color:var(--warn)}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+
+/* Multi-select de licencias */
+.lic-picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;max-height:220px;overflow-y:auto;padding:10px;border:1.5px solid var(--line);border-radius:12px;background:#f8fafc;-webkit-overflow-scrolling:touch}
+.lic-chk{position:relative;display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-size:13px;font-weight:700;color:var(--navy2);transition:.15s;user-select:none}
+.lic-chk:hover{border-color:var(--sky)}
+.lic-chk input{width:16px;height:16px;margin:0;accent-color:var(--blue);flex:none;-webkit-appearance:checkbox;appearance:checkbox}
+.lic-chk.checked{border-color:var(--blue);background:var(--sky2);color:var(--navy)}
+.lic-chk.disabled{opacity:.55;cursor:not-allowed;background:#eef2f7}
+
+/* Sección Licencias en Ficha */
+.lic-section{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+.lic-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.lic-cards{display:flex;flex-direction:column;gap:8px}
+.lic-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:#f8fafc}
+.lic-item-info{min-width:0;flex:1}
+.lic-item-title{font-weight:800;color:var(--navy);font-size:14.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lic-item-meta{font-size:12.5px;color:var(--mut);margin-top:2px}
+.lic-add-panel{margin-top:12px;padding:14px;border:1.5px solid rgba(27,110,194,.25);border-radius:12px;background:#f8fbff}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border:0;border-radius:11px;font-weight:700;cursor:pointer;transition:.15s;background:var(--sky2);color:var(--blue);white-space:nowrap}
+.btn:hover{filter:brightness(.97);transform:translateY(-1px)}
+.btn:active{transform:none}
+.btn.primary{background:linear-gradient(135deg,var(--blue),#0f4c93);color:#fff;box-shadow:0 6px 14px rgba(27,110,194,.28)}
+.btn.ok{background:var(--ok);color:#fff}
+.btn.danger{background:var(--errbg);color:var(--err)}
+.btn.danger.solid{background:var(--err);color:#fff}
+.btn.ghost{background:#fff;border:1.5px solid var(--line);color:var(--navy2)}
+.btn.sm{padding:7px 11px;font-size:13px;border-radius:9px}
+.btn.icon{padding:8px;border-radius:9px}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;filter:none}
+.btn.busy{position:relative;color:transparent!important;pointer-events:none}
+.btn.busy::after{content:"";position:absolute;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.btn.busy:not(.primary):not(.ok):not(.solid)::after{border-color:rgba(27,110,194,.25);border-top-color:var(--blue)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.badge.ok{background:var(--okbg);color:var(--ok)}.badge.warn{background:var(--warnbg);color:var(--warn)}
+.badge.err{background:var(--errbg);color:var(--err)}.badge.gray{background:#eef2f7;color:var(--mut)}.badge.info{background:var(--sky2);color:var(--blue)}
+
+/* Alumnos */
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.search{position:relative;flex:1;min-width:220px}
+.search .ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--mut)}
+.search .input{padding-left:40px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.letter{position:relative;min-width:40px;height:40px;padding:0 10px;border:1.5px solid var(--line);background:#fff;border-radius:10px;font-weight:700;color:var(--navy2);cursor:pointer;transition:.15s}
+.letter:hover{border-color:var(--sky)}
+.letter.vacio{color:#b4bfce;font-weight:500}
+.letter.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.letter i{position:absolute;top:-6px;right:-5px;background:var(--sky);color:#fff;font-style:normal;font-size:10px;min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+.letter.wide{padding:0 14px}
+.lista-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:var(--mut);font-size:13.5px}
+.al-row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:12px 14px;border:1.5px solid transparent;background:#fff;border-radius:12px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--line)}
+.al-row:hover{background:var(--sky2);border-color:rgba(56,182,255,.4)}
+.avatar{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--sky2),#cfe8ff);color:var(--blue);display:grid;place-items:center;font-weight:800;flex:none}
+.al-main{flex:1;min-width:0}
+.al-name{font-weight:700;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.al-sub{font-size:13px;color:var(--mut);display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:2px}
+.al-cat{font-size:13px;color:var(--mut);text-align:right}
+.empty{text-align:center;color:var(--mut);padding:36px 12px}
+.empty .ico{font-size:34px;color:#b4c3d6;display:block;margin:0 auto 8px}
+
+/* Ficha */
+.dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px}
+.dl div.full{grid-column:1/-1}
+.dl dt{font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.dl dd{margin:0;font-weight:600;color:var(--navy);word-break:break-word;white-space:pre-wrap}
+.ficha-head{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.ficha-head .avatar{width:56px;height:56px;font-size:20px;border-radius:16px}
+.ficha-head h2{font-size:20px}
+
+/* Calendario de Eventos */
+.cal-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:18px;align-items:start}
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.cal-month{font-size:19px;font-weight:800;color:var(--navy);text-transform:capitalize}
+.cal-nav{display:flex;gap:6px;align-items:center}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-bottom:6px;text-align:center;font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal-cell{min-height:84px;padding:7px;border:1.5px solid var(--line);border-radius:12px;background:#fff;display:flex;flex-direction:column;gap:4px;cursor:pointer;transition:.15s;text-align:left;min-width:0;position:relative}
+.cal-cell:hover{border-color:var(--sky);background:#f8fbff}
+.cal-cell.out{background:#f8fafc;color:#a0aec0;border-color:#eef2f7}
+.cal-cell.today{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+.cal-cell.selected{background:var(--sky2);border-color:var(--blue)}
+.cal-cell.has-ev{border-color:#bae6fd}
+.cal-day-num{font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:4px}
+.cal-today-tag{font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase}
+.cal-pills{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cal-pill{font-size:11px;font-weight:700;padding:2px 6px;border-radius:6px;background:var(--navy);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-pill.CONFIRMADO{background:var(--ok)}
+.cal-pill.EN_CURSO{background:var(--blue)}
+.cal-pill.FINALIZADO{background:var(--mut)}
+.cal-pill.CANCELADO{background:var(--err);text-decoration:line-through}
+.cal-more{font-size:11px;font-weight:700;color:var(--blue)}
+.cal-dots{display:none;gap:4px;flex-wrap:wrap;margin-top:auto}
+.cal-dot{width:7px;height:7px;border-radius:50%;background:var(--blue)}
+.cal-day-panel{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.cal-day-panel h4{margin:0 0 10px;font-size:14px;color:var(--navy)}
+
+.upcoming-list{display:flex;flex-direction:column;gap:12px}
+.ev-card{border:1.5px solid var(--line);border-radius:12px;padding:14px;background:#fff;transition:.15s}
+.ev-card:hover{border-color:#bae6fd;box-shadow:0 4px 12px rgba(11,37,69,.05)}
+.ev-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.ev-card-title{font-weight:800;font-size:15.5px;color:var(--navy)}
+.ev-card-desc{margin:6px 0 0;font-size:13px;color:var(--mut);white-space:pre-wrap}
+.ev-jornadas{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid #eef2f7}
+.ev-jor-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;padding:6px 10px;border-radius:9px;background:#f8fafc}
+.ev-jor-date{font-weight:700;color:var(--navy2)}
+.ev-card-acts{display:flex;gap:6px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
+
+.jornada-edit-row{display:grid;grid-template-columns:1.3fr 1fr 1fr auto;gap:8px;align-items:end;padding:10px;border:1.5px solid var(--line);border-radius:11px;background:#f8fafc;margin-bottom:8px}
+
+/* Config */
+.cfg-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-top:16px}
+.cat-add{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.cat-add .input{flex:1;min-width:160px}
+.cat-list{list-style:none;margin:0;padding:0}
+.cat-list li{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.cat-list li:last-child{border:0}
+.cat-list .nm{flex:1;min-width:120px;font-weight:600;word-break:break-word}
+.cat-list .nm.off{color:var(--mut);text-decoration:line-through}
+.cat-list .us{font-size:12px;color:var(--mut)}
+
+/* Modal / toasts / loader */
+.overlay{position:fixed;inset:0;background:rgba(8,20,40,.55);display:none;align-items:flex-start;justify-content:center;padding:4vh 14px;overflow-y:auto;z-index:100}
+.overlay.open{display:flex}
+#confirm{z-index:120;align-items:center}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:680px;box-shadow:0 24px 60px rgba(8,20,40,.35);animation:pop .2s;margin:auto}
+.modal.sm{max-width:440px}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.modal-h{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}
+.modal-h h3{font-size:18px}
+.modal-b{padding:22px}
+.modal-f{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:0 22px 22px}
+.x{border:0;background:#eef2f7;border-radius:9px;padding:7px;cursor:pointer;color:var(--mut)}
+.toasts{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:200;max-width:min(380px,calc(100vw - 36px))}
+.toast{display:flex;gap:10px;align-items:flex-start;background:#fff;border-left:5px solid var(--sky);box-shadow:0 10px 30px rgba(8,20,40,.22);border-radius:12px;padding:13px 14px;animation:pop .2s;font-weight:600}
+.toast.ok{border-color:var(--ok)}.toast.ok .ico{color:var(--ok)}
+.toast.err{border-color:var(--err)}.toast.err .ico{color:var(--err)}
+.loader{position:fixed;inset:0;background:rgba(243,246,251,.55);display:none;place-items:center;z-index:150}
+.loader.on{display:grid}
+.spinner{width:46px;height:46px;border:4px solid #cfe3f7;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+.progress{position:fixed;left:0;top:0;height:3px;width:0;background:linear-gradient(90deg,var(--sky),var(--blue));z-index:300;transition:width .4s}
+.boot{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy),var(--navy2));display:grid;place-items:center;z-index:400;color:#fff;text-align:center;padding:20px;overflow-y:auto}
+.boot h1{color:#fff;font-size:28px;letter-spacing:-.5px}
+.boot p{color:#a9c6e4;margin:8px 0 22px}
+.boot .spinner{margin:0 auto;border-color:rgba(255,255,255,.2);border-top-color:var(--sky)}
+.boot .btn{margin-top:6px}
+.boot-config-card{max-width:460px;margin:12px auto 0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:16px;text-align:left}
+.boot-config-card label{display:block;font-size:12.5px;font-weight:700;color:#cfe3f7;margin-bottom:6px}
+.boot-config-card .input{color:var(--navy);background:#fff}
+
+/* Responsive */
+@media(max-width:1100px){
+  .cal-layout{grid-template-columns:1fr}
+}
+@media(max-width:960px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:none}
+  .backdrop.open{display:block}
+  .main{margin-left:0}
+  .burger{display:block}
+  .topbar{padding:12px 16px}
+  .content{padding:18px 16px 50px}
+  .charts{grid-template-columns:1fr}
+  .chart-wide{grid-column:auto}
+}
+@media(max-width:720px){
+  .stats{grid-template-columns:1fr;gap:10px}
+  .stat{padding:14px;gap:12px;flex-direction:row;align-items:center}
+  .stat .vl{font-size:20px}
+  .form-grid,.dl{grid-template-columns:1fr}
+  .topbar .date{display:none}
+  .page-head h1{font-size:22px}
+  .al-cat{display:none}
+  .overlay{padding:0;align-items:flex-end}
+  .modal{border-radius:18px 18px 0 0;max-width:none;margin:auto 0 0;max-height:94vh;overflow-y:auto}
+  #confirm{align-items:flex-end}
+  .toasts{left:14px;right:14px;bottom:14px;max-width:none}
+  .cal-cell{min-height:54px;padding:6px 4px;align-items:center}
+  .cal-day-num{width:100%;justify-content:center;font-size:13px}
+  .cal-today-tag,.cal-pills,.cal-more{display:none}
+  .cal-dots{display:flex;justify-content:center}
+  .jornada-edit-row{grid-template-columns:1fr 1fr}
+  .jornada-edit-row .jor-date-col{grid-column:1/-1}
+  .jornada-edit-row .jor-del-col{grid-column:1/-1;justify-self:end}
+  .boot-logo-wrap{width:140px;height:140px}
+}
+
+/* ================= SAFARI IOS Y PANTALLAS TÁCTILES ================= */
+html { min-height:100%; min-height:-webkit-fill-available; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+body { min-height:100vh; min-height:-webkit-fill-available; min-height:100dvh; overflow-x:hidden; -webkit-tap-highlight-color:transparent; }
+.app { min-height:100vh; min-height:100dvh; }
+button, a, input, select, textarea { touch-action:manipulation; }
+button, input, select, textarea { -webkit-appearance:none; }
+.sidebar { padding-top:max(22px,env(safe-area-inset-top)); padding-bottom:max(22px,env(safe-area-inset-bottom)); }
+.topbar { padding-top:max(12px,env(safe-area-inset-top)); }
+.content { padding-bottom:max(60px,calc(60px + env(safe-area-inset-bottom))); }
+.overlay { padding-top:max(12px,env(safe-area-inset-top)); padding-bottom:max(12px,env(safe-area-inset-bottom)); }
+.modal { max-height:92vh; max-height:92dvh; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
+.toasts { bottom:max(14px,calc(14px + env(safe-area-inset-bottom))); }
+@supports (-webkit-touch-callout:none) { input, select, textarea { font-size:16px !important; } }
+@media(max-width:720px) {
+  html, body { width:100%; }
+  .app { width:100%; min-width:0; }
+  .main { min-width:0; width:100%; }
+  .topbar, .content { padding-left:max(14px,env(safe-area-inset-left)); padding-right:max(14px,env(safe-area-inset-right)); }
+  .content { padding-bottom:max(72px,calc(72px + env(safe-area-inset-bottom))); }
+  .card, .panel, .stat { min-width:0; }
+  .modal { width:100%; max-height:94vh; max-height:94dvh; padding-bottom:max(18px,env(safe-area-inset-bottom)); }
+  button, .btn, select { min-height:42px; }
+  input, select, textarea { max-width:100%; }
+}
+@media(max-width:390px) {
+  .page-head h1 { font-size:20px; }
+  .modal { border-radius:16px 16px 0 0; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<div class="boot" id="boot">
+  <div style="max-width:500px;width:100%;">
+    <div class="boot-logo-wrap" data-logo-box="boot">
+      <img class="brand-logo-img" src="assets/logo.png" alt="Logo oficial SurVial Academia de Conductores Profesionales">
+    </div>
+    <h1>SurVial Gestión</h1>
+    <p id="boot-msg">Preparando tu espacio de trabajo…</p>
+    <div class="spinner" id="boot-spin"></div>
+    <div id="boot-err" hidden></div>
+  </div>
+</div>
+
+<div class="app" id="app" hidden>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-logo-wrap" data-logo-box="sidebar">
+        <img class="brand-logo-img" src="assets/logo.png" alt="Logo oficial SurVial">
+      </div>
+      <div class="brand-name">SurVial<span>Gestión</span></div>
+    </div>
+    <nav class="nav" id="nav">
+      <button data-view="inicio" class="active"><span data-ico="home"></span>Inicio</button>
+      <button data-view="nuevo"><span data-ico="userplus"></span>Nuevo alumno</button>
+      <button data-view="alumnos"><span data-ico="users"></span>Alumnos</button>
+      <button data-view="calendario"><span data-ico="calendar"></span>Calendario de eventos</button>
+      <button data-view="config"><span data-ico="settings"></span>Configuración</button>
+    </nav>
+    <div class="side-foot">
+      <b id="side-empresa">SurVial Gestión</b>
+      <span>Gestión de licencias de conducir</span>
+      <button id="btn-refrescar" type="button">Actualizar datos</button>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="burger" id="burger" type="button" aria-label="Abrir menú"><span data-ico="menu"></span></button>
+      <div class="topbar-logo-wrap" data-logo-box="topbar">
+        <img class="brand-logo-img" src="assets/logo.png" alt="Logo oficial SurVial">
+      </div>
+      <h2 id="titulo-vista">Inicio</h2>
+      <span class="date" id="fecha-hoy"></span>
+    </header>
+    <main class="content">
+
+      <!-- INICIO -->
+      <section class="view active" id="view-inicio">
+        <div class="page-head"><div><h1>Panel de inicio</h1><p>Resumen general de alumnos, licencias y actividad reciente.</p></div></div>
+        <div class="grid stats" id="stats-inicio"></div>
+        <div class="grid charts">
+          <div class="card"><h3>Categorías que más alumnos desean obtener</h3><div class="chart-box"><canvas id="ch-deseadas"></canvas><div class="vacio-msg">Todavía no hay alumnos registrados.</div></div></div>
+          <div class="card"><h3>Categorías que más alumnos poseen</h3><div class="chart-box"><canvas id="ch-actuales"></canvas><div class="vacio-msg">Todavía no hay alumnos registrados.</div></div></div>
+          <div class="card chart-wide"><h3>Alumnos pagados y pendientes</h3><div class="chart-box"><canvas id="ch-pagos"></canvas><div class="vacio-msg">Todavía no hay alumnos registrados.</div></div></div>
+        </div>
+        <div class="card"><h3>Actividad reciente</h3><ul class="activity" id="actividad"></ul></div>
+      </section>
+
+      <!-- NUEVO ALUMNO -->
+      <section class="view" id="view-nuevo">
+        <div class="page-head"><div><h1>Nuevo alumno</h1><p>Completá los datos para inscribir a un alumno. Los campos con <b style="color:var(--err)">*</b> son obligatorios.</p></div></div>
+        <div class="card"><form id="form-nuevo" novalidate><div id="nuevo-campos"></div>
+          <div class="form-actions"><button type="button" class="btn ghost" id="btn-limpiar">Limpiar</button><button type="submit" class="btn primary" id="btn-registrar"><span data-ico="check"></span>Registrar alumno</button></div>
+        </form></div>
+      </section>
+
+      <!-- ALUMNOS -->
+      <section class="view" id="view-alumnos">
+        <div class="page-head"><div><h1>Alumnos</h1><p>Directorio ordenado por apellido. Elegí una letra o buscá por nombre, apellido o DNI.</p></div></div>
+        <div class="toolbar"><div class="search"><span data-ico="search"></span><input class="input" id="q-alumnos" type="search" placeholder="Buscar por nombre, apellido o DNI" autocomplete="off"></div></div>
+        <div class="letters" id="letters"></div>
+        <div class="card"><div class="lista-head"><span id="lista-titulo"></span><span id="lista-cnt"></span></div><div id="lista-alumnos"></div></div>
+      </section>
+
+      <!-- CALENDARIO DE EVENTOS -->
+      <section class="view" id="view-calendario">
+        <div class="page-head">
+          <div>
+            <h1>Calendario de eventos</h1>
+            <p>Organizá las fechas y jornadas de dictado de los cursos de SurVial.</p>
+          </div>
+          <button class="btn primary" type="button" id="btn-nuevo-evento"><span data-ico="plus"></span>Agregar evento</button>
+        </div>
+
+        <div class="cal-layout">
+          <div class="card">
+            <div class="cal-head">
+              <div class="cal-month" id="cal-mes-titulo">Mes</div>
+              <div class="cal-nav">
+                <button class="btn ghost sm" type="button" id="cal-prev" aria-label="Mes anterior">‹</button>
+                <button class="btn ghost sm" type="button" id="cal-hoy">Hoy</button>
+                <button class="btn ghost sm" type="button" id="cal-next" aria-label="Mes siguiente">›</button>
+              </div>
+            </div>
+            <div class="cal-weekdays">
+              <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+            <div class="cal-day-panel" id="cal-day-panel"></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+              <h3 style="margin:0">Próximos eventos</h3>
+              <select class="select" id="ev-filtro" style="width:auto;padding:7px 10px;font-size:13px" aria-label="Filtrar eventos">
+                <option value="proximos">Próximos</option>
+                <option value="todos">Todos los cursos</option>
+                <option value="pasados">Pasados / Finalizados</option>
+              </select>
+            </div>
+            <div id="proximos-eventos-lista"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONFIGURACIÓN -->
+      <section class="view" id="view-config">
+        <div class="page-head"><div><h1>Configuración</h1><p>Datos de la empresa, responsables de recordatorios y categorías de licencias.</p></div></div>
+        <div class="card" style="margin-bottom:16px"><h3>Datos de la empresa</h3><form id="form-empresa" novalidate><div id="empresa-campos"></div>
+          <div class="form-actions"><button type="submit" class="btn primary" id="btn-empresa"><span data-ico="check"></span>Guardar datos</button></div></form></div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+            <h3 style="margin:0">Correos de responsables y recordatorios automáticos</h3>
+            <button class="btn ghost sm" type="button" id="btn-prueba-mail"><span data-ico="mail"></span>Enviar correo de prueba</button>
+          </div>
+          <p class="hint" style="margin:0 0 14px">El sistema envía automáticamente un recordatorio <b>5 días antes</b> de cada jornada de dictado programada (zona horaria Argentina).</p>
+          <form class="cat-add" id="form-resp" novalidate>
+            <input class="input" id="resp-nombre" maxlength="80" placeholder="Nombre del responsable (opcional)" autocomplete="off" style="max-width:240px">
+            <input class="input" id="resp-email" type="email" maxlength="120" placeholder="correo@ejemplo.com" autocomplete="email">
+            <button class="btn primary" type="submit" id="btn-resp-add"><span data-ico="plus"></span>Agregar correo</button>
+          </form>
+          <ul class="cat-list" id="lista-responsables"></ul>
+          <div id="log-recordatorios" style="margin-top:14px"></div>
+        </div>
+
+        <div class="cfg-grid" id="cfg-cats"></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div class="overlay" id="modal"><div class="modal" id="modal-box" role="dialog" aria-modal="true"></div></div>
+<div class="overlay" id="confirm"><div class="modal sm" id="confirm-box" role="alertdialog" aria-modal="true"></div></div>
+<div class="loader" id="loader"><div class="spinner"></div></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(function () {
+'use strict';
+
+/* Si alojás este HTML en GitHub Pages, pegá aquí la URL "/exec" de tu implementación de Google Apps Script */
+var DEFAULT_API_URL = '';
+
+/* ======================= Utilidades ======================= */
+var $ = function (s, r) { return (r || document).querySelector(s); };
+var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+var ICONS = {
+  home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  userplus: '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>',
+  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  settings: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+  edit: '<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
+  search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  menu: '<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  power: '<path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>',
+  activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+  award: '<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>'
+};
+function ico(n, c) {
+  return '<svg class="ico ' + (c || '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[n] || '') + '</svg>';
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
+}
+function norm(s) {
+  var t = String(s == null ? '' : s).toLowerCase();
+  try { t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (e) {}
+  return t.replace(/\s+/g, ' ').trim();
+}
+function normCat(v) {
+  return String(v == null ? '' : v).toUpperCase().replace(/\s+/g, '').replace(/\./g, '');
+}
+var COL = new Intl.Collator('es-AR', { sensitivity: 'base', numeric: true });
+function fmtFecha(f) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(f || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : (f || ''); }
+function fmtDni(d) { return String(d || '').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+function fmtHora(s) { var m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/.exec(s || ''); return m ? m[3] + '/' + m[2] + ' ' + m[4] + ':' + m[5] : ''; }
+function fmtHoraFull(s) { var m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/.exec(s || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] + ' ' + m[4] + ':' + m[5] : '—'; }
+var MESES_L = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+function iniciales(a) { return ((a.apellido || '?').charAt(0) + (a.nombre || '').charAt(0)).toUpperCase(); }
+function nombreCompleto(a) { return a.nombre + ' ' + a.apellido; }
+function badgePago(e) { return e === 'PAGADO' ? '<span class="badge ok">Pagado</span>' : '<span class="badge warn">Pendiente</span>'; }
+function fechaValida(s) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); if (!m) return false;
+  var y = +m[1], mo = +m[2], d = +m[3]; if (y < 2000 || y > 2100) return false;
+  var dt = new Date(Date.UTC(y, mo - 1, d));
+  return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
+}
+function fmtHorario(j) {
+  if (!j || !j.horaInicio) return '';
+  return j.horaFin ? (j.horaInicio + ' a ' + j.horaFin + ' hs') : (j.horaInicio + ' hs');
+}
+
+/* ======================= Estado ======================= */
+var S = {
+  hoy: '', alumnos: [], categorias: [], eventos: [],
+  responsables: [], recordatorios: [], catalogoLicencias: [],
+  config: {}, estadisticas: null, actividad: []
+};
+var UI = {
+  view: 'inicio', letra: null, q: '', busy: false,
+  fichaId: null, fichaEdit: false, mostrarAddLic: false,
+  evId: null, calYear: 0, calMonth: 0, calSelectedDay: '', evFiltro: 'proximos',
+  empresaDirty: false
+};
+var charts = {};
+var TITULOS = {
+  inicio: 'Inicio',
+  nuevo: 'Nuevo alumno',
+  alumnos: 'Alumnos',
+  calendario: 'Calendario de eventos',
+  config: 'Configuración'
+};
+
+/* ======================= Logos y fallback seguro ======================= */
+function inicializarLogos() {
+  $$('[data-logo-box]').forEach(function (box) {
+    var img = $('img', box);
+    if (!img) return;
+    img.addEventListener('error', function () {
+      box.innerHTML = '<div class="brand-logo-fallback">SV</div>';
+    });
+  });
+}
+
+/* ======================= Comunicación híbrida (GAS + GitHub Pages HTTP) ======================= */
+var cargas = 0;
+function loading(on) {
+  cargas += on ? 1 : -1; if (cargas < 0) cargas = 0;
+  $('#loader').classList.toggle('on', cargas > 0);
+  var p = $('#progress'); p.style.width = cargas > 0 ? '70%' : '100%';
+  if (cargas === 0) setTimeout(function () { if (cargas === 0) p.style.width = '0'; }, 400);
+}
+function obtenerApiUrl() {
+  var saved = '';
+  try { saved = localStorage.getItem('survial_api_url') || ''; } catch (e) {}
+  return (saved || DEFAULT_API_URL || '').trim();
+}
+function esModoGas() {
+  return typeof google !== 'undefined' && google.script && google.script.run;
+}
+function msgError(e) {
+  var m = (e && e.message) ? String(e.message) : String(e || 'Error sin detalle');
+  if (/permission|authorization|autoriz|permiso|access denied/i.test(m)) return 'Error de permisos de Google: ' + m.replace(/^Error:\s*/, '').substring(0, 220);
+  if (/timeout|network|conex|failed to fetch|load failed|unavailable/i.test(m)) return 'Error de comunicación con el servidor: ' + m.replace(/^Error:\s*/, '').substring(0, 220);
+  if (/spreadsheet|hoja de cálculo|planilla|sheet/i.test(m)) return 'Error al acceder a Google Sheets: ' + m.replace(/^Error:\s*/, '').substring(0, 220);
+  return 'Error del servidor: ' + m.replace(/^Error:\s*/, '').substring(0, 220);
+}
+function api(fn, args) {
+  args = Array.isArray(args) ? args : [];
+
+  if (esModoGas()) {
+    return new Promise(function (resolve) {
+      loading(true);
+      var finalizado = false;
+      var timer = setTimeout(function () {
+        terminar({ ok: false, error: 'El servidor tardó demasiado en responder (tiempo de espera agotado). Verificá tu conexión o los permisos de la implementación.' });
+      }, 25000);
+
+      function terminar(respuesta) {
+        if (finalizado) return;
+        finalizado = true;
+        clearTimeout(timer);
+        loading(false);
+        resolve(respuesta);
+      }
+
+      var runner = google.script.run
+        .withSuccessHandler(function (r) {
+          terminar(r || { ok: false, error: 'El servidor respondió sin devolver datos.' });
+        })
+        .withFailureHandler(function (e) {
+          console.error('[SurVial] Falló google.script.run:', e);
+          terminar({ ok: false, error: msgError(e) });
+        });
+
+      try {
+        if (typeof runner[fn] !== 'function') {
+          throw new Error('La operación "' + String(fn) + '" no existe en el servidor.');
+        }
+        runner[fn].apply(runner, args);
+      } catch (e) {
+        terminar({ ok: false, error: 'No se pudo iniciar la operación "' + String(fn) + '": ' + (e && e.message ? e.message : String(e)) });
+      }
+    });
+  }
+
+  var url = obtenerApiUrl();
+  if (!url) {
+    return Promise.resolve({
+      ok: false,
+      faltaUrl: true,
+      error: 'Falta configurar la URL de implementación (/exec) de Google Apps Script para conectar desde GitHub Pages.'
+    });
+  }
+
+  loading(true);
+  var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  var abortTimer = setTimeout(function () { if (controller) controller.abort(); }, 25000);
+
+  return fetch(url, {
+    method: 'POST',
+    mode: 'cors',
+    redirect: 'follow',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: fn, args: args }),
+    signal: controller ? controller.signal : undefined
+  }).then(function (resp) {
+    clearTimeout(abortTimer);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return resp.text();
+  }).then(function (txt) {
+    loading(false);
+    try {
+      return JSON.parse(txt);
+    } catch (parseErr) {
+      return { ok: false, error: 'La respuesta del servidor no es JSON válido. Verificá que la Web App esté publicada para "Cualquier usuario".' };
+    }
+  }).catch(function (err) {
+    clearTimeout(abortTimer);
+    loading(false);
+    return { ok: false, error: msgError(err) };
+  });
+}
+
+function setBusyBtns(btns, on, main) {
+  (btns || []).forEach(function (b) { if (b) b.disabled = on; });
+  if (main) main.classList.toggle('busy', on);
+}
+async function accion(fn, args, btns, main) {
+  if (UI.busy) return { ok: false, busy: true };
+  UI.busy = true; setBusyBtns(btns, true, main);
+  var r = await api(fn, args);
+  UI.busy = false; setBusyBtns(btns, false, main);
+  if (r.ok) { if (r.estado) aplicarEstado(r.estado); if (r.mensaje) toast(r.mensaje, 'ok'); }
+  else toast(r.error || 'Error desconocido.', 'err');
+  return r;
+}
+function aplicarEstado(e) {
+  S.hoy = e.hoy; S.alumnos = e.alumnos || [];
+  S.categorias = (e.categorias || []).filter(function (c) { return c.tipo === 'LICENCIA'; });
+  S.eventos = e.eventos || [];
+  S.responsables = e.responsables || []; S.recordatorios = e.recordatorios || [];
+  S.catalogoLicencias = e.catalogoLicencias || [];
+  S.config = e.config || {}; S.estadisticas = e.estadisticas; S.actividad = e.actividad || [];
+
+  if (!UI.calYear && S.hoy) {
+    UI.calYear = Number(S.hoy.substring(0, 4));
+    UI.calMonth = Number(S.hoy.substring(5, 7));
+    UI.calSelectedDay = S.hoy;
+  }
+
+  if (UI.fichaId) {
+    var a = S.alumnos.filter(function (x) { return x.id === UI.fichaId; })[0];
+    if (!a) cerrarModal(true); else if (!UI.fichaEdit) renderFicha();
+  }
+  renderCabecera();
+  render();
+}
+
+/* ======================= UI base: toasts, modales ======================= */
+function toast(msg, tipo) {
+  var t = document.createElement('div');
+  t.className = 'toast ' + (tipo || 'info');
+  t.innerHTML = ico(tipo === 'ok' ? 'check' : tipo === 'err' ? 'alert' : 'info') + '<span>' + esc(msg) + '</span>';
+  $('#toasts').appendChild(t);
+  setTimeout(function () { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 320); }, tipo === 'err' ? 7000 : 4200);
+}
+function abrirModal(html) {
+  $('#modal-box').innerHTML = html;
+  $('#modal').classList.add('open'); document.body.classList.add('noscroll');
+  var f = $('#modal-box input:not([type=radio]):not([type=hidden]):not([type=checkbox]), #modal-box select, #modal-box textarea');
+  if (f && window.innerWidth > 720) setTimeout(function () { try { f.focus(); } catch (e) {} }, 60);
+}
+function cerrarModal(forzar) {
+  if (UI.busy && !forzar) return;
+  $('#modal').classList.remove('open'); $('#modal-box').innerHTML = '';
+  document.body.classList.remove('noscroll');
+  UI.fichaId = null; UI.fichaEdit = false; UI.mostrarAddLic = false; UI.evId = null; UI.catCtx = null; UI.respCtx = null;
+}
+function confirmar(o) {
+  return new Promise(function (resolve) {
+    var box = $('#confirm-box');
+    box.innerHTML = '<div class="modal-h"><h3>' + esc(o.titulo) + '</h3></div><div class="modal-b"><p style="margin:0">' + o.mensaje + '</p></div>' +
+      '<div class="modal-f"><button class="btn ghost" data-r="0" type="button">Cancelar</button><button class="btn ' + (o.peligro ? 'danger solid' : 'primary') + '" data-r="1" type="button">' + esc(o.ok || 'Aceptar') + '</button></div>';
+    var ov = $('#confirm'); ov.classList.add('open');
+    function fin(v) { ov.classList.remove('open'); ov.onclick = null; document.removeEventListener('keydown', onKey, true); box.innerHTML = ''; resolve(v); }
+    function onKey(e) { if (e.key === 'Escape') { e.stopPropagation(); fin(false); } }
+    box.onclick = function (e) { var b = e.target.closest('[data-r]'); if (b) fin(b.getAttribute('data-r') === '1'); };
+    ov.onclick = function (e) { if (e.target === ov) fin(false); };
+    document.addEventListener('keydown', onKey, true);
+    var b = $('[data-r="0"]', box); if (b) b.focus();
+  });
+}
+
+/* ======================= Gráficos ======================= */
+function dibujar(id, cfg, vacio) {
+  var el = document.getElementById(id); if (!el) return;
+  var box = el.parentNode; box.classList.toggle('vacio', !!vacio);
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+  if (typeof Chart === 'undefined') { box.classList.add('vacio'); $('.vacio-msg', box).textContent = 'No se pudo cargar la librería de gráficos (revisá tu conexión).'; return; }
+  if (vacio) return;
+  Chart.defaults.font.family = 'Inter, "Segoe UI", system-ui, sans-serif';
+  Chart.defaults.color = '#64748b';
+  charts[id] = new Chart(el, cfg);
+}
+var C = { sky: '#38b6ff', blue: '#1b6ec2', navy: '#0b2545', ok: '#10b981', warn: '#f5a623' };
+function opcBarras(horizontal, leyenda) {
+  var v = { beginAtZero: true, grid: { color: '#eef2f7' }, ticks: { precision: 0 } };
+  var c = { grid: { display: false } };
+  return {
+    responsive: true, maintainAspectRatio: false, indexAxis: horizontal ? 'y' : 'x',
+    plugins: {
+      legend: { display: !!leyenda, position: 'bottom' },
+      tooltip: { callbacks: { label: function (ctx) { var val = horizontal ? ctx.parsed.x : ctx.parsed.y; return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + val; } } }
+    },
+    scales: horizontal ? { x: v, y: c } : { x: c, y: v }
+  };
+}
+
+/* ======================= Navegación y render ======================= */
+function go(v) {
+  UI.view = v;
+  $$('.view').forEach(function (s) { s.classList.toggle('active', s.id === 'view-' + v); });
+  $$('#nav button').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-view') === v); });
+  $('#titulo-vista').textContent = TITULOS[v] || '';
+  cerrarMenu(); render(); window.scrollTo(0, 0);
+}
+function render() {
+  if (UI.view === 'inicio') renderInicio();
+  else if (UI.view === 'nuevo') renderNuevo();
+  else if (UI.view === 'alumnos') renderAlumnos();
+  else if (UI.view === 'calendario') renderCalendario();
+  else if (UI.view === 'config') renderConfig();
+}
+function renderCabecera() {
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(S.hoy || '');
+  if (m) $('#fecha-hoy').textContent = new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  $('#side-empresa').textContent = (S.config.empresa_nombre || 'SurVial Gestión');
+}
+function abrirMenu() { $('#sidebar').classList.add('open'); $('#backdrop').classList.add('open'); }
+function cerrarMenu() { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('open'); }
+
+/* ======================= INICIO ======================= */
+function statCard(icon, label, value, tone) {
+  return '<div class="card stat ' + (tone || '') + '"><div class="ic">' + ico(icon) + '</div><div><div class="lb">' + esc(label) + '</div><div class="vl">' + esc(value) + '</div></div></div>';
+}
+function renderInicio() {
+  var r = S.estadisticas.resumen, g = S.estadisticas.graficos;
+  $('#stats-inicio').innerHTML =
+    statCard('users', 'Alumnos registrados', r.totalAlumnos) +
+    statCard('check', 'Alumnos que pagaron', r.pagados, 'ok') +
+    statCard('clock', 'Pagos pendientes', r.pendientes, 'warn');
+
+  var top = function (arr) { return arr.slice(0, 10); };
+  var d = top(g.deseadas), a = top(g.actuales);
+  dibujar('ch-deseadas', { type: 'bar', data: { labels: d.map(function (x) { return x.nombre; }), datasets: [{ label: 'Alumnos', data: d.map(function (x) { return x.cantidad; }), backgroundColor: C.sky, borderRadius: 8 }] }, options: opcBarras(false, false) }, d.length === 0);
+  dibujar('ch-actuales', { type: 'bar', data: { labels: a.map(function (x) { return x.nombre; }), datasets: [{ label: 'Alumnos', data: a.map(function (x) { return x.cantidad; }), backgroundColor: C.blue, borderRadius: 8 }] }, options: opcBarras(false, false) }, a.length === 0);
+  dibujar('ch-pagos', { type: 'doughnut', data: { labels: ['Pagados', 'Pendientes'], datasets: [{ data: [g.pagos.pagados, g.pagos.pendientes], backgroundColor: [C.ok, C.warn], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '62%', plugins: { legend: { position: 'bottom' } } } }, g.pagos.pagados + g.pagos.pendientes === 0);
+
+  var ul = $('#actividad');
+  if (!S.actividad.length) { ul.innerHTML = '<li class="empty" style="display:block">' + ico('activity') + 'Todavía no hay actividad registrada.</li>'; return; }
+  ul.innerHTML = S.actividad.map(function (e) {
+    var ic = e.tipo === 'evento' ? 'calendar' : 'users';
+    return '<li><div class="dot ' + esc(e.tipo) + '">' + ico(ic) + '</div><div class="t">' + esc(e.texto) + '</div><div class="w">' + esc(fmtHora(e.fecha)) + '</div></li>';
+  }).join('');
+}
+
+/* ======================= Catálogo y formularios de alumno ======================= */
+function catsLic(valorActual) {
+  var l = S.categorias.filter(function (c) { return c.tipo === 'LICENCIA' && (c.activo || c.nombre === valorActual); });
+  return l.sort(function (a, b) { return COL.compare(a.nombre, b.nombre); });
+}
+function descLicencia(nombre) {
+  var k = normCat(nombre);
+  var f = (S.catalogoLicencias || []).filter(function (c) { return normCat(c.nombre) === k; })[0];
+  return f ? f.descripcion : '';
+}
+function optsCat(lista, sel, vacio) {
+  var h = vacio ? '<option value="">' + esc(vacio) + '</option>' : '';
+  return h + lista.map(function (c) { return '<option value="' + esc(c.nombre) + '"' + (c.nombre === sel ? ' selected' : '') + '>' + esc(c.nombre) + (c.activo ? '' : ' (desactivada)') + '</option>'; }).join('');
+}
+function selectorLicenciasHTML(prefix, seleccionadas, bloqueadas) {
+  var lista = catsLic('');
+  var selMap = {}; (seleccionadas || []).forEach(function (n) { selMap[normCat(n)] = true; });
+  var bloqMap = {}; (bloqueadas || []).forEach(function (n) { bloqMap[normCat(n)] = true; });
+  return '<div class="lic-picker-grid" id="' + prefix + '-lic-grid">' + lista.map(function (c) {
+    var k = normCat(c.nombre);
+    var isBloq = !!bloqMap[k];
+    var isChk = !!selMap[k];
+    var desc = descLicencia(c.nombre);
+    return '<label class="lic-chk' + (isChk ? ' checked' : '') + (isBloq ? ' disabled' : '') + '" title="' + esc(desc || c.nombre) + '">' +
+      '<input type="checkbox" value="' + esc(c.nombre) + '"' + (isChk ? ' checked' : '') + (isBloq ? ' disabled' : '') + '>' +
+      '<span>' + esc(c.nombre) + (isBloq ? ' ✓' : '') + '</span></label>';
+  }).join('') + '</div>';
+}
+function alumnoFormHTML(p, d, incluirLicencias) {
+  d = d || {};
+  var estado = d.estadoPago || 'PENDIENTE';
+  var licsInit = (d.licencias || []).map(function (l) { return l.categoria; });
+  return '<div class="form-grid">' +
+    campo(p, 'nombre', 'Nombre', true, '<input class="input" id="' + p + '-nombre" maxlength="60" autocomplete="off" value="' + esc(d.nombre || '') + '">') +
+    campo(p, 'apellido', 'Apellido', true, '<input class="input" id="' + p + '-apellido" maxlength="60" autocomplete="off" value="' + esc(d.apellido || '') + '">') +
+    campo(p, 'dni', 'DNI', true, '<input class="input" id="' + p + '-dni" inputmode="numeric" maxlength="10" autocomplete="off" placeholder="Solo números" value="' + esc(d.dni || '') + '">') +
+    campo(p, 'fechaInscripcion', 'Fecha de inscripción', true, '<input class="input" type="date" id="' + p + '-fechaInscripcion" value="' + esc(d.fechaInscripcion || S.hoy) + '">') +
+    (incluirLicencias
+      ? '<div class="field full" data-f="' + p + '-catActual"><span class="lbl">Licencias actuales (podés elegir una o varias)</span>' + selectorLicenciasHTML(p, licsInit, []) + '<span class="hint">Si no posee licencias previas, dejá todas sin marcar.</span><small class="err" data-err="' + p + '-catActual"></small></div>'
+      : '') +
+    campo(p, 'catSolicitada', 'Categoría que desea obtener', true, '<select class="select" id="' + p + '-catSolicitada">' + optsCat(catsLic(d.catSolicitada), d.catSolicitada || '', 'Seleccionar…') + '</select>') +
+    '<div class="field' + (incluirLicencias ? '' : ' full') + '" data-f="' + p + '-estadoPago"><span class="lbl">Estado del pago <i style="color:var(--err);font-style:normal">*</i></span><div class="seg">' +
+      '<label><input type="radio" name="' + p + '-estado" value="PAGADO"' + (estado === 'PAGADO' ? ' checked' : '') + '><span class="ok">' + ico('check') + 'PAGADO</span></label>' +
+      '<label><input type="radio" name="' + p + '-estado" value="PENDIENTE"' + (estado === 'PENDIENTE' ? ' checked' : '') + '><span class="warn">' + ico('clock') + 'PENDIENTE</span></label>' +
+    '</div><small class="err" data-err="' + p + '-estadoPago"></small></div>' +
+    '<div class="field full" data-f="' + p + '-observaciones"><label for="' + p + '-observaciones">Observaciones</label><textarea class="textarea" id="' + p + '-observaciones" maxlength="500">' + esc(d.observaciones || '') + '</textarea><small class="err" data-err="' + p + '-observaciones"></small></div>' +
+  '</div>';
+}
+function campo(p, key, label, req, inner) {
+  return '<div class="field" data-f="' + p + '-' + key + '"><label for="' + p + '-' + key + '">' + esc(label) + (req ? ' <i>*</i>' : '') + '</label>' + inner + '<small class="err" data-err="' + p + '-' + key + '"></small></div>';
+}
+function leerAlumnoForm(p, leerLics) {
+  var v = function (k) { var e = $('#' + p + '-' + k); return e ? e.value : ''; };
+  var r = $('input[name="' + p + '-estado"]:checked');
+  var lics = [];
+  if (leerLics) {
+    $$('#' + p + '-lic-grid input:checked').forEach(function (chk) { lics.push(chk.value); });
+  }
+  return {
+    nombre: v('nombre').replace(/\s+/g, ' ').trim(), apellido: v('apellido').replace(/\s+/g, ' ').trim(),
+    dni: v('dni').replace(/\D/g, ''), licencias: lics, catSolicitada: v('catSolicitada'),
+    estadoPago: r ? r.value : '', fechaInscripcion: v('fechaInscripcion'), observaciones: v('observaciones').trim()
+  };
+}
+function mostrarErrores(p, errs) {
+  $$('[data-f^="' + p + '-"]').forEach(function (f) { f.classList.remove('invalid'); });
+  $$('[data-err^="' + p + '-"]').forEach(function (s) { s.textContent = ''; });
+  var primero = null;
+  Object.keys(errs).forEach(function (k) {
+    var s = $('[data-err="' + p + '-' + k + '"]'), f = $('[data-f="' + p + '-' + k + '"]');
+    if (s) s.textContent = errs[k]; if (f) { f.classList.add('invalid'); if (!primero) primero = f; }
+  });
+  if (primero) { var i = $('input,select,textarea', primero); if (i) { try { i.focus(); } catch (e) {} } }
+}
+function validarAlumnoCliente(d, idActual) {
+  var e = {};
+  if (!d.nombre) e.nombre = 'Ingresá el nombre.'; else if (d.nombre.length > 60) e.nombre = 'Máximo 60 caracteres.';
+  if (!d.apellido) e.apellido = 'Ingresá el apellido.'; else if (d.apellido.length > 60) e.apellido = 'Máximo 60 caracteres.';
+  if (!/^\d{7,8}$/.test(d.dni) || /^(\d)\1+$/.test(d.dni) || Number(d.dni) < 1000000) e.dni = 'DNI inválido: debe tener 7 u 8 dígitos.';
+  else {
+    var dup = S.alumnos.filter(function (a) { return a.dni === d.dni && a.id !== idActual; })[0];
+    if (dup) e.dni = 'Ya existe un alumno con ese DNI (' + dup.apellido + ', ' + dup.nombre + ').';
+  }
+  if (!d.catSolicitada) e.catSolicitada = 'Seleccioná la categoría que desea obtener.';
+  if (d.estadoPago !== 'PAGADO' && d.estadoPago !== 'PENDIENTE') e.estadoPago = 'Elegí el estado del pago.';
+  if (!fechaValida(d.fechaInscripcion)) e.fechaInscripcion = 'Ingresá una fecha válida.';
+  if (d.observaciones.length > 500) e.observaciones = 'Máximo 500 caracteres.';
+  return e;
+}
+
+/* ======================= NUEVO ALUMNO ======================= */
+function renderNuevo() {
+  var w = $('#nuevo-campos');
+  if (!w.children.length) { w.innerHTML = alumnoFormHTML('n', {}, true); return; }
+  var cs = $('#n-catSolicitada').value;
+  $('#n-catSolicitada').innerHTML = optsCat(catsLic(cs), cs, 'Seleccionar…');
+}
+function limpiarNuevo() { $('#nuevo-campos').innerHTML = alumnoFormHTML('n', {}, true); }
+async function enviarNuevo(ev) {
+  ev.preventDefault();
+  if (UI.busy) return;
+  var d = leerAlumnoForm('n', true), errs = validarAlumnoCliente(d, null);
+  mostrarErrores('n', errs);
+  if (Object.keys(errs).length) { toast('Revisá los campos marcados en rojo.', 'err'); return; }
+  var btns = $$('#form-nuevo button'), main = $('#btn-registrar');
+  var r = await accion('registrarAlumno', [d], btns, main);
+  if (r.ok) { limpiarNuevo(); }
+  else if (r.campo) { var o = {}; o[r.campo] = r.error; mostrarErrores('n', o); }
+}
+
+/* ======================= ALUMNOS (directorio) ======================= */
+function inicialDe(a) { var c = norm(a.apellido).charAt(0).toUpperCase(); return /[A-Z]/.test(c) ? c : '#'; }
+function alumnosOrdenados() {
+  return S.alumnos.slice().sort(function (a, b) { return COL.compare(a.apellido, b.apellido) || COL.compare(a.nombre, b.nombre); });
+}
+function renderAlumnos() { renderLetras(); renderLista(); }
+function conteoLetras() { var c = {}; S.alumnos.forEach(function (a) { var l = inicialDe(a); c[l] = (c[l] || 0) + 1; }); return c; }
+function renderLetras() {
+  var c = conteoLetras(), letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  if (c['#']) letras.push('#');
+  if (UI.letra === null) { UI.letra = letras.filter(function (l) { return c[l]; })[0] || 'TODOS'; }
+  var h = '<button type="button" class="letter wide' + (UI.letra === 'TODOS' ? ' active' : '') + '" data-letra="TODOS">Todos<i>' + S.alumnos.length + '</i></button>';
+  h += letras.map(function (l) {
+    return '<button type="button" class="letter' + (UI.letra === l ? ' active' : '') + (c[l] ? '' : ' vacio') + '" data-letra="' + l + '">' + l + (c[l] ? '<i>' + c[l] + '</i>' : '') + '</button>';
+  }).join('');
+  $('#letters').innerHTML = h;
+}
+function renderLista() {
+  var q = norm(UI.q), qd = UI.q.replace(/\D/g, ''), lista, titulo;
+  var todos = alumnosOrdenados();
+  if (q) {
+    lista = todos.filter(function (a) {
+      return norm(a.nombre).indexOf(q) >= 0 || norm(a.apellido).indexOf(q) >= 0 || norm(a.apellido + ' ' + a.nombre).indexOf(q) >= 0 || norm(a.nombre + ' ' + a.apellido).indexOf(q) >= 0 || (qd.length >= 2 && a.dni.indexOf(qd) >= 0);
+    });
+    titulo = 'Resultados de la búsqueda';
+  } else if (UI.letra === 'TODOS') { lista = todos; titulo = 'Todos los alumnos'; }
+  else { lista = todos.filter(function (a) { return inicialDe(a) === UI.letra; }); titulo = 'Apellidos con ' + UI.letra; }
+  $('#lista-titulo').textContent = titulo;
+  $('#lista-cnt').textContent = lista.length + (lista.length === 1 ? ' alumno' : ' alumnos');
+  var box = $('#lista-alumnos');
+  if (!lista.length) {
+    box.innerHTML = '<div class="empty">' + ico('users') + (S.alumnos.length ? (q ? 'No se encontraron alumnos con esa búsqueda.' : 'No hay alumnos con apellido que empiece con esa letra.') : 'Todavía no hay alumnos registrados. Usá “Nuevo alumno” para empezar.') + '</div>';
+    return;
+  }
+  box.innerHTML = lista.map(function (a) {
+    var lics = (a.licencias && a.licencias.length) ? a.licencias.map(function (l) { return l.categoria; }) : (a.catActual ? [a.catActual] : []);
+    var licsBadges = lics.length
+      ? lics.map(function (c) { return '<span class="badge info" style="padding:2px 8px;font-size:11px">' + esc(c) + '</span>'; }).join('')
+      : '<span class="muted">Sin licencias</span>';
+    return '<button type="button" class="al-row" data-id="' + esc(a.id) + '"><div class="avatar">' + esc(iniciales(a)) + '</div>' +
+      '<div class="al-main"><div class="al-name">' + esc(a.apellido) + ', ' + esc(a.nombre) + '</div><div class="al-sub"><span>DNI ' + esc(fmtDni(a.dni)) + '</span>' + licsBadges + '</div></div>' +
+      '<div class="al-cat">Desea: <b>' + esc(a.catSolicitada || '—') + '</b></div>' + badgePago(a.estadoPago) + '</button>';
+  }).join('');
+}
+
+/* ----- Ficha individual + Sección Licencias ----- */
+function abrirFicha(id) { UI.fichaId = id; UI.fichaEdit = false; UI.mostrarAddLic = false; renderFicha(true); }
+function renderSeccionLicenciasHTML(a) {
+  var lics = a.licencias || [];
+  var poseidas = lics.map(function (l) { return l.categoria; });
+  var listaHtml = lics.length
+    ? '<div class="lic-cards">' + lics.map(function (l) {
+        var desc = descLicencia(l.categoria);
+        return '<div class="lic-item">' +
+          '<div class="lic-item-info">' +
+            '<div class="lic-item-title">' + ico('award') + '<span>' + esc(l.categoria) + '</span>' +
+              (l.fechaObtencion ? '<span class="badge gray">' + esc(fmtFecha(l.fechaObtencion)) + '</span>' : '') +
+            '</div>' +
+            (desc ? '<div class="lic-item-meta">' + esc(desc) + '</div>' : '') +
+            (l.observaciones ? '<div class="lic-item-meta">Nota: ' + esc(l.observaciones) + '</div>' : '') +
+          '</div>' +
+          '<button class="btn danger sm" type="button" data-lic-del="' + esc(l.id) + '" data-lic-name="' + esc(l.categoria) + '" aria-label="Quitar licencia">' + ico('trash') + 'Quitar</button>' +
+        '</div>';
+      }).join('') + '</div>'
+    : '<p class="muted" style="margin:0;font-size:13.5px">Este alumno aún no tiene licencias cargadas.</p>';
+
+  var addHtml = UI.mostrarAddLic
+    ? '<form id="form-add-lic" class="lic-add-panel" novalidate>' +
+        '<div style="font-weight:700;color:var(--navy);margin-bottom:8px">Seleccioná una o varias licencias para sumar al alumno:</div>' +
+        selectorLicenciasHTML('al', [], poseidas) +
+        '<div class="form-grid" style="margin-top:12px">' +
+          '<div class="field"><label for="al-lic-fecha">Fecha de obtención</label><input class="input" type="date" id="al-lic-fecha" value="' + esc(S.hoy) + '"></div>' +
+          '<div class="field"><label for="al-lic-obs">Observación (opcional)</label><input class="input" id="al-lic-obs" maxlength="300" placeholder="Ej: Curso aprobado"></div>' +
+        '</div>' +
+        '<div class="form-actions" style="margin-top:12px">' +
+          '<button class="btn ghost sm" type="button" data-act="cancelar-add-lic">Cancelar</button>' +
+          '<button class="btn primary sm" type="submit" id="btn-guardar-lics">' + ico('check') + 'Agregar seleccionadas</button>' +
+        '</div>' +
+      '</form>'
+    : '';
+
+  return '<div class="lic-section">' +
+    '<div class="lic-section-head">' +
+      '<h3 style="margin:0;font-size:16px">Licencias (' + lics.length + ')</h3>' +
+      (!UI.mostrarAddLic ? '<button class="btn ok sm" type="button" data-act="abrir-add-lic">' + ico('plus') + 'Agregar licencia</button>' : '') +
+    '</div>' +
+    listaHtml +
+    addHtml +
+  '</div>';
+}
+function renderFicha(abrir) {
+  var a = S.alumnos.filter(function (x) { return x.id === UI.fichaId; })[0];
+  if (!a) return;
+  var html;
+  if (!UI.fichaEdit) {
+    html = '<div class="modal-h"><h3>Ficha del alumno</h3><button class="x" type="button" data-act="cerrar" aria-label="Cerrar">' + ico('x') + '</button></div>' +
+      '<div class="modal-b"><div class="ficha-head"><div class="avatar">' + esc(iniciales(a)) + '</div><div><h2>' + esc(nombreCompleto(a)) + '</h2>' + badgePago(a.estadoPago) + '</div></div>' +
+      '<dl class="dl">' +
+      '<div><dt>Nombre completo</dt><dd>' + esc(nombreCompleto(a)) + '</dd></div><div><dt>DNI</dt><dd>' + esc(fmtDni(a.dni)) + '</dd></div>' +
+      '<div><dt>Categoría solicitada</dt><dd>' + esc(a.catSolicitada || '—') + '</dd></div><div><dt>Estado del pago</dt><dd>' + badgePago(a.estadoPago) + '</dd></div>' +
+      '<div><dt>Fecha de inscripción</dt><dd>' + esc(fmtFecha(a.fechaInscripcion)) + '</dd></div><div><dt>Última modificación</dt><dd style="font-weight:500">' + esc(fmtHoraFull(a.modificado)) + '</dd></div>' +
+      '<div class="full"><dt>Observaciones</dt><dd>' + esc(a.observaciones || '—') + '</dd></div>' +
+      '</dl>' +
+      renderSeccionLicenciasHTML(a) +
+      '</div>' +
+      '<div class="modal-f"><button class="btn danger" type="button" data-act="eliminar">' + ico('trash') + 'ELIMINAR ALUMNO</button><button class="btn primary" type="button" data-act="editar">' + ico('edit') + 'EDITAR DATOS</button></div>';
+  } else {
+    html = '<div class="modal-h"><h3>Editar datos personales</h3><button class="x" type="button" data-act="cancelar" aria-label="Cancelar edición">' + ico('x') + '</button></div>' +
+      '<form id="form-ficha" novalidate><div class="modal-b">' + alumnoFormHTML('e', a, false) +
+      '<p class="hint" style="margin:12px 0 0">Las licencias actuales del alumno se administran desde la sección "Licencias" de su ficha y se conservan intactas.</p>' +
+      '</div>' +
+      '<div class="modal-f"><button class="btn ghost" type="button" data-act="cancelar">CANCELAR EDICIÓN</button><button class="btn primary" type="submit" id="btn-ficha-guardar">' + ico('check') + 'GUARDAR CAMBIOS</button></div></form>';
+  }
+  if (abrir || !$('#modal').classList.contains('open')) abrirModal(html);
+  else { $('#modal-box').innerHTML = html; }
+}
+async function guardarFicha() {
+  var a = S.alumnos.filter(function (x) { return x.id === UI.fichaId; })[0];
+  if (!a || UI.busy) return;
+  var d = leerAlumnoForm('e', false); d.id = a.id;
+  var errs = validarAlumnoCliente(d, a.id);
+  mostrarErrores('e', errs);
+  if (Object.keys(errs).length) { toast('Revisá los campos marcados en rojo.', 'err'); return; }
+  var r = await accion('editarAlumno', [d], $$('#modal-box button'), $('#btn-ficha-guardar'));
+  if (r.ok) { UI.fichaEdit = false; renderFicha(); }
+  else if (r.campo) { var o = {}; o[r.campo] = r.error; mostrarErrores('e', o); }
+}
+async function eliminarFicha() {
+  var a = S.alumnos.filter(function (x) { return x.id === UI.fichaId; })[0];
+  if (!a || UI.busy) return;
+  var ok = await confirmar({ titulo: 'Eliminar alumno', mensaje: '¿Seguro que querés eliminar a <b>' + esc(nombreCompleto(a)) + '</b> (DNI ' + esc(fmtDni(a.dni)) + ')? Esta acción no se puede deshacer.', ok: 'Sí, eliminar', peligro: true });
+  if (!ok) return;
+  var r = await accion('eliminarAlumno', [a.id], $$('#modal-box button'), null);
+  if (r.ok) cerrarModal(true);
+}
+async function guardarNuevasLicencias() {
+  if (UI.busy || !UI.fichaId) return;
+  var seleccionadas = [];
+  $$('#al-lic-grid input:checked').forEach(function (chk) { seleccionadas.push(chk.value); });
+  if (!seleccionadas.length) { toast('Seleccioná al menos una licencia para agregar.', 'err'); return; }
+  var fecha = $('#al-lic-fecha').value || S.hoy;
+  if (!fechaValida(fecha)) { toast('Ingresá una fecha válida.', 'err'); return; }
+  var obs = ($('#al-lic-obs').value || '').trim();
+  var r = await accion('agregarLicenciasAlumno', [{ alumnoId: UI.fichaId, categorias: seleccionadas, fechaObtencion: fecha, observaciones: obs }], $$('#modal-box button'), $('#btn-guardar-lics'));
+  if (r.ok) { UI.mostrarAddLic = false; renderFicha(); }
+}
+async function quitarLicenciaDePerfil(licId, nombreCat) {
+  if (UI.busy || !UI.fichaId) return;
+  var ok = await confirmar({
+    titulo: 'Quitar licencia',
+    mensaje: '¿Seguro que querés quitar la licencia <b>' + esc(nombreCat) + '</b> del perfil de este alumno?',
+    ok: 'Sí, quitar',
+    peligro: true
+  });
+  if (!ok) return;
+  var r = await accion('quitarLicenciaAlumno', [{ alumnoId: UI.fichaId, licenciaId: licId }], $$('#modal-box button'), null);
+  if (r.ok) renderFicha();
+}
+
+/* ======================= CALENDARIO DE EVENTOS ======================= */
+function estadoEventoBadge(est) {
+  var e = String(est || 'PROGRAMADO').toUpperCase();
+  var cls = e === 'CONFIRMADO' ? 'ok' : e === 'EN CURSO' ? 'info' : e === 'FINALIZADO' ? 'gray' : e === 'CANCELADO' ? 'err' : 'warn';
+  return '<span class="badge ' + cls + '">' + esc(e) + '</span>';
+}
+function todasLasJornadasConEvento() {
+  var mapa = {};
+  (S.eventos || []).forEach(function (ev) {
+    (ev.jornadas || []).forEach(function (j) {
+      if (!j.fecha) return;
+      if (!mapa[j.fecha]) mapa[j.fecha] = [];
+      mapa[j.fecha].push({ evento: ev, jornada: j });
+    });
+  });
+  Object.keys(mapa).forEach(function (f) {
+    mapa[f].sort(function (a, b) {
+      return (a.jornada.horaInicio || '99:99').localeCompare(b.jornada.horaInicio || '99:99') || COL.compare(a.evento.nombreCurso, b.evento.nombreCurso);
+    });
+  });
+  return mapa;
+}
+function renderCalendario() {
+  if (!UI.calYear || !UI.calMonth) {
+    var base = S.hoy || '2026-01-01';
+    UI.calYear = Number(base.substring(0, 4));
+    UI.calMonth = Number(base.substring(5, 7));
+    UI.calSelectedDay = base;
+  }
+  $('#cal-mes-titulo').textContent = MESES_L[UI.calMonth - 1] + ' ' + UI.calYear;
+
+  var porDia = todasLasJornadasConEvento();
+  var firstDay = new Date(Date.UTC(UI.calYear, UI.calMonth - 1, 1));
+  var startDow = (firstDay.getUTCDay() + 6) % 7;
+  var daysInMonth = new Date(Date.UTC(UI.calYear, UI.calMonth, 0)).getUTCDate();
+  var prevDays = new Date(Date.UTC(UI.calYear, UI.calMonth - 1, 0)).getUTCDate();
+
+  var cells = [];
+  for (var p = startDow - 1; p >= 0; p--) {
+    var pm = UI.calMonth - 1, py = UI.calYear;
+    if (pm < 1) { pm = 12; py--; }
+    var dNum = prevDays - p;
+    var isoP = py + '-' + ('0' + pm).slice(-2) + '-' + ('0' + dNum).slice(-2);
+    cells.push({ iso: isoP, day: dNum, out: true });
+  }
+  for (var d = 1; d <= daysInMonth; d++) {
+    var iso = UI.calYear + '-' + ('0' + UI.calMonth).slice(-2) + '-' + ('0' + d).slice(-2);
+    cells.push({ iso: iso, day: d, out: false });
+  }
+  var rem = cells.length % 7;
+  if (rem !== 0) {
+    var add = 7 - rem;
+    for (var n = 1; n <= add; n++) {
+      var nm = UI.calMonth + 1, ny = UI.calYear;
+      if (nm > 12) { nm = 1; ny++; }
+      var isoN = ny + '-' + ('0' + nm).slice(-2) + '-' + ('0' + n).slice(-2);
+      cells.push({ iso: isoN, day: n, out: true });
+    }
+  }
+
+  $('#cal-grid').innerHTML = cells.map(function (c) {
+    var lista = porDia[c.iso] || [];
+    var isToday = c.iso === S.hoy;
+    var isSel = c.iso === UI.calSelectedDay;
+    var cls = 'cal-cell' + (c.out ? ' out' : '') + (isToday ? ' today' : '') + (isSel ? ' selected' : '') + (lista.length ? ' has-ev' : '');
+    var pills = lista.slice(0, 2).map(function (item) {
+      var stCls = String(item.evento.estado || 'PROGRAMADO').replace(/\s+/g, '_');
+      var hr = item.jornada.horaInicio ? item.jornada.horaInicio + ' ' : '';
+      return '<div class="cal-pill ' + esc(stCls) + '" title="' + esc(item.evento.nombreCurso) + '">' + esc(hr + item.evento.nombreCurso) + '</div>';
+    }).join('');
+    var more = lista.length > 2 ? '<div class="cal-more">+' + (lista.length - 2) + ' más</div>' : '';
+    var dots = lista.slice(0, 4).map(function () { return '<span class="cal-dot"></span>'; }).join('');
+    return '<button type="button" class="' + cls + '" data-cal-day="' + c.iso + '">' +
+      '<div class="cal-day-num"><span>' + c.day + '</span>' + (isToday ? '<span class="cal-today-tag">Hoy</span>' : '') + '</div>' +
+      '<div class="cal-pills">' + pills + more + '</div>' +
+      '<div class="cal-dots">' + dots + '</div>' +
+    '</button>';
+  }).join('');
+
+  renderDetalleDiaCalendario(porDia);
+  renderProximosEventos();
+}
+
+function renderDetalleDiaCalendario(porDia) {
+  var fecha = UI.calSelectedDay || S.hoy;
+  var lista = porDia[fecha] || [];
+  var panel = $('#cal-day-panel');
+  if (!lista.length) {
+    panel.innerHTML = '<h4>Jornadas del ' + esc(fmtFecha(fecha)) + '</h4><p class="muted" style="margin:0;font-size:13.5px">No hay cursos programados para este día. <button class="btn ghost sm" type="button" data-add-ev-fecha="' + esc(fecha) + '" style="margin-left:6px">+ Programar en esta fecha</button></p>';
+    return;
+  }
+  panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px">' +
+    '<h4 style="margin:0">Jornadas del ' + esc(fmtFecha(fecha)) + ' (' + lista.length + ')</h4>' +
+    '<button class="btn ghost sm" type="button" data-add-ev-fecha="' + esc(fecha) + '">+ Agregar en este día</button>' +
+  '</div>' +
+  '<div class="ev-jornadas" style="border:0;padding:0;margin:0">' +
+  lista.map(function (item) {
+    var hr = fmtHorario(item.jornada) || 'Horario a confirmar';
+    return '<div class="ev-jor-row" style="border:1px solid var(--line);background:#fff;padding:10px 12px">' +
+      '<div style="min-width:0;flex:1"><div style="font-weight:700;color:var(--navy)">' + esc(item.evento.nombreCurso) + '</div>' +
+      '<div class="hint">' + esc(hr) + ' · ' + esc(item.evento.estado) + '</div></div>' +
+      '<button class="btn ghost sm" type="button" data-ev-view="' + esc(item.evento.id) + '">Ver</button>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function renderProximosEventos() {
+  var filtro = UI.evFiltro || 'proximos';
+  $('#ev-filtro').value = filtro;
+  var hoy = S.hoy || '';
+
+  var items = (S.eventos || []).map(function (ev) {
+    var todas = (ev.jornadas || []).slice().sort(function (a, b) { return a.fecha < b.fecha ? -1 : a.fecha > b.fecha ? 1 : 0; });
+    var pendientes = todas.filter(function (j) { return j.fecha >= hoy; });
+    var esActivo = ev.estado !== 'CANCELADO' && ev.estado !== 'FINALIZADO';
+    var nextFecha = pendientes.length ? pendientes[0].fecha : (todas.length ? todas[todas.length - 1].fecha : '');
+    return { ev: ev, todas: todas, pendientes: pendientes, esActivo: esActivo, nextFecha: nextFecha };
+  });
+
+  if (filtro === 'proximos') {
+    items = items.filter(function (x) { return x.pendientes.length > 0 && x.esActivo; });
+    items.sort(function (a, b) { return a.nextFecha < b.nextFecha ? -1 : a.nextFecha > b.nextFecha ? 1 : COL.compare(a.ev.nombreCurso, b.ev.nombreCurso); });
+  } else if (filtro === 'pasados') {
+    items = items.filter(function (x) { return x.pendientes.length === 0 || !x.esActivo; });
+    items.sort(function (a, b) { return a.nextFecha > b.nextFecha ? -1 : a.nextFecha < b.nextFecha ? 1 : 0; });
+  } else {
+    items.sort(function (a, b) { return a.nextFecha < b.nextFecha ? -1 : a.nextFecha > b.nextFecha ? 1 : 0; });
+  }
+
+  var box = $('#proximos-eventos-lista');
+  if (!items.length) {
+    box.innerHTML = '<div class="empty" style="padding:24px 10px">' + ico('calendar') +
+      (filtro === 'proximos' ? 'No hay cursos próximos programados. Usá "Agregar evento" para cargar uno.' : 'No hay eventos en esta vista.') + '</div>';
+    return;
+  }
+
+  box.innerHTML = '<div class="upcoming-list">' + items.map(function (x) {
+    var ev = x.ev;
+    var jorsMostrar = (filtro === 'proximos' ? x.pendientes : x.todas);
+    var jorHtml = jorsMostrar.map(function (j) {
+      var hr = fmtHorario(j);
+      return '<div class="ev-jor-row">' +
+        '<span class="ev-jor-date">' + esc(fmtFecha(j.fecha)) + '</span>' +
+        '<span class="muted">' + esc(hr || 'Sin horario') + '</span>' +
+      '</div>';
+    }).join('');
+    return '<div class="ev-card">' +
+      '<div class="ev-card-top">' +
+        '<div style="min-width:0;flex:1">' +
+          '<div class="ev-card-title">' + esc(ev.nombreCurso) + '</div>' +
+          (ev.descripcion ? '<p class="ev-card-desc">' + esc(ev.descripcion.length > 140 ? ev.descripcion.substring(0, 140) + '…' : ev.descripcion) + '</p>' : '') +
+        '</div>' +
+        estadoEventoBadge(ev.estado) +
+      '</div>' +
+      '<div class="ev-jornadas">' + jorHtml + '</div>' +
+      '<div class="ev-card-acts">' +
+        '<button class="btn ghost sm" type="button" data-ev-view="' + esc(ev.id) + '">Detalles</button>' +
+        '<button class="btn ghost sm" type="button" data-ev-edit="' + esc(ev.id) + '">' + ico('edit') + 'Editar</button>' +
+        '<button class="btn danger sm" type="button" data-ev-del="' + esc(ev.id) + '">' + ico('trash') + 'Eliminar</button>' +
+      '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+/* ----- Modales de Evento ----- */
+function abrirEventoDetalle(id) {
+  var ev = (S.eventos || []).filter(function (x) { return x.id === id; })[0];
+  if (!ev) return;
+  UI.evId = id;
+  var jHtml = (ev.jornadas || []).map(function (j, idx) {
+    var hr = fmtHorario(j) || 'Horario a confirmar';
+    return '<div class="ev-jor-row" style="border:1px solid var(--line);background:#f8fafc">' +
+      '<span><b>Jornada ' + (idx + 1) + ':</b> ' + esc(fmtFecha(j.fecha)) + '</span>' +
+      '<span class="muted">' + esc(hr) + '</span>' +
+    '</div>';
+  }).join('');
+
+  abrirModal(
+    '<div class="modal-h"><h3>Detalle del evento</h3><button class="x" type="button" data-act="cerrar" aria-label="Cerrar">' + ico('x') + '</button></div>' +
+    '<div class="modal-b">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px">' +
+        '<h2 style="font-size:20px">' + esc(ev.nombreCurso) + '</h2>' + estadoEventoBadge(ev.estado) +
+      '</div>' +
+      '<dl class="dl">' +
+        '<div class="full"><dt>Descripción u observaciones</dt><dd>' + esc(ev.descripcion || '—') + '</dd></div>' +
+        '<div class="full"><dt>Jornadas de dictado (' + (ev.jornadas || []).length + ')</dt><dd><div class="ev-jornadas" style="border:0;padding:0;margin-top:6px">' + (jHtml || '—') + '</div></dd></div>' +
+      '</dl>' +
+    '</div>' +
+    '<div class="modal-f">' +
+      '<button class="btn danger" type="button" data-act="ev-eliminar">' + ico('trash') + 'Eliminar</button>' +
+      '<button class="btn primary" type="button" data-act="ev-editar">' + ico('edit') + 'Editar evento</button>' +
+    '</div>'
+  );
+}
+
+function filaJornadaModalHTML(j) {
+  j = j || {};
+  return '<div class="jornada-edit-row" data-jor-id="' + esc(j.id || '') + '">' +
+    '<div class="field jor-date-col"><label>Fecha de dictado <i>*</i></label><input class="input jor-fecha" type="date" value="' + esc(j.fecha || S.hoy) + '"></div>' +
+    '<div class="field"><label>Hora inicio</label><input class="input jor-hini" type="time" value="' + esc(j.horaInicio || '') + '"></div>' +
+    '<div class="field"><label>Hora fin</label><input class="input jor-hfin" type="time" value="' + esc(j.horaFin || '') + '"></div>' +
+    '<div class="jor-del-col"><button class="btn danger icon sm jor-del" type="button" title="Quitar jornada" aria-label="Quitar jornada">' + ico('trash') + '</button></div>' +
+  '</div>';
+}
+
+function abrirEventoModal(id, fechaPreseleccionada) {
+  var ev = id ? (S.eventos || []).filter(function (x) { return x.id === id; })[0] : null;
+  if (id && !ev) { toast('El evento ya no existe.', 'err'); return; }
+  UI.evId = id || null;
+
+  var jornadas = ev && ev.jornadas && ev.jornadas.length
+    ? ev.jornadas
+    : [{ id: '', fecha: fechaPreseleccionada || UI.calSelectedDay || S.hoy, horaInicio: '', horaFin: '' }];
+  var estadoActual = ev ? ev.estado : 'PROGRAMADO';
+  var opcionesEst = ['PROGRAMADO', 'CONFIRMADO', 'EN CURSO', 'FINALIZADO', 'CANCELADO'].map(function (st) {
+    return '<option value="' + st + '"' + (st === estadoActual ? ' selected' : '') + '>' + st + '</option>';
+  }).join('');
+
+  abrirModal(
+    '<div class="modal-h"><h3>' + (ev ? 'Editar evento' : 'Agregar evento') + '</h3><button class="x" type="button" data-act="cerrar" aria-label="Cerrar">' + ico('x') + '</button></div>' +
+    '<form id="form-evento" novalidate><div class="modal-b">' +
+      '<div class="form-grid">' +
+        campo('ev', 'nombreCurso', 'Nombre del curso', true, '<input class="input" id="ev-nombreCurso" maxlength="120" placeholder="Ej: Curso de conducción profesional" value="' + esc(ev ? ev.nombreCurso : '') + '">') +
+        campo('ev', 'estado', 'Estado del evento', true, '<select class="select" id="ev-estado">' + opcionesEst + '</select>') +
+        '<div class="field full" data-f="ev-descripcion"><label for="ev-descripcion">Descripción u observaciones</label><textarea class="textarea" id="ev-descripcion" maxlength="1000" placeholder="Modalidad, aula, requisitos, instructor...">' + esc(ev ? ev.descripcion : '') + '</textarea><small class="err" data-err="ev-descripcion"></small></div>' +
+        '<div class="field full">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px">' +
+            '<span class="lbl">Fechas de dictado (jornadas) <i style="color:var(--err);font-style:normal">*</i></span>' +
+            '<button class="btn ghost sm" type="button" id="btn-add-jornada">' + ico('plus') + 'Agregar otra fecha</button>' +
+          '</div>' +
+          '<div id="ev-jornadas-list">' + jornadas.map(filaJornadaModalHTML).join('') + '</div>' +
+          '<small class="err" data-err="ev-jornadas"></small>' +
+          '<span class="hint">Cada jornada recibirá su propio recordatorio automático 5 días antes de su fecha.</span>' +
+        '</div>' +
+      '</div>' +
+    '</div><div class="modal-f">' +
+      '<button class="btn ghost" type="button" data-act="cerrar">Cancelar</button>' +
+      '<button class="btn primary" type="submit" id="btn-ev-guardar">' + ico('check') + (ev ? 'Guardar cambios' : 'Guardar evento') + '</button>' +
+    '</div></form>'
+  );
+}
+
+async function guardarEventoForm() {
+  if (UI.busy) return;
+  var nombreCurso = $('#ev-nombreCurso').value.replace(/\s+/g, ' ').trim();
+  var estado = $('#ev-estado').value;
+  var descripcion = $('#ev-descripcion').value.trim();
+  var errs = {};
+  if (!nombreCurso) errs.nombreCurso = 'Ingresá el nombre del curso.';
+  if (descripcion.length > 1000) errs.descripcion = 'Máximo 1000 caracteres.';
+
+  var jornadas = [];
+  var rows = $$('#ev-jornadas-list .jornada-edit-row');
+  if (!rows.length) {
+    errs.jornadas = 'Agregá al menos una jornada.';
+  } else {
+    var vistos = {};
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var f = $('.jor-fecha', r).value;
+      var hi = $('.jor-hini', r).value;
+      var hf = $('.jor-hfin', r).value;
+      if (!fechaValida(f)) { errs.jornadas = 'La fecha de la jornada #' + (i + 1) + ' no es válida.'; break; }
+      if (hi && hf && hf <= hi) { errs.jornadas = 'En la jornada #' + (i + 1) + ', la hora de fin debe ser posterior a la de inicio.'; break; }
+      var key = f + '|' + hi + '|' + hf;
+      if (vistos[key]) { errs.jornadas = 'Hay jornadas repetidas con la misma fecha y horario.'; break; }
+      vistos[key] = true;
+      jornadas.push({ id: r.getAttribute('data-jor-id') || '', fecha: f, horaInicio: hi, horaFin: hf });
+    }
+  }
+
+  mostrarErrores('ev', errs);
+  if (Object.keys(errs).length) { toast('Revisá los datos del evento.', 'err'); return; }
+
+  var payload = { id: UI.evId || '', nombreCurso: nombreCurso, estado: estado, descripcion: descripcion, jornadas: jornadas };
+  var res = await accion('guardarEvento', [payload], $$('#modal-box button'), $('#btn-ev-guardar'));
+  if (res.ok) {
+    if (jornadas.length) {
+      UI.calSelectedDay = jornadas[0].fecha;
+      UI.calYear = Number(jornadas[0].fecha.substring(0, 4));
+      UI.calMonth = Number(jornadas[0].fecha.substring(5, 7));
+    }
+    cerrarModal(true);
+  }
+}
+
+async function eliminarEventoConfirm(id) {
+  var ev = (S.eventos || []).filter(function (x) { return x.id === id; })[0];
+  if (!ev || UI.busy) return;
+  var ok = await confirmar({
+    titulo: 'Eliminar evento',
+    mensaje: '¿Seguro que querés eliminar el curso <b>' + esc(ev.nombreCurso) + '</b> y todas sus jornadas programadas?',
+    ok: 'Sí, eliminar',
+    peligro: true
+  });
+  if (!ok) return;
+  var r = await accion('eliminarEvento', [id], $$('#modal-box button'), null);
+  if (r.ok) cerrarModal(true);
+}
+
+/* ======================= CONFIGURACIÓN ======================= */
+var CAMPOS_EMPRESA = [['empresa_nombre', 'Nombre de la empresa', true], ['empresa_cuit', 'CUIT', false], ['empresa_telefono', 'Teléfono', false], ['empresa_email', 'Correo electrónico', false], ['empresa_direccion', 'Dirección', false], ['empresa_ciudad', 'Ciudad', false]];
+var GRUPOS_CAT = [['LICENCIA', 'Categorías de licencias']];
+function renderConfig() { renderEmpresa(); renderResponsables(); renderCategorias(); }
+function renderEmpresa() {
+  var w = $('#empresa-campos');
+  if (w.children.length && UI.empresaDirty) return;
+  w.innerHTML = '<div class="form-grid">' + CAMPOS_EMPRESA.map(function (c) {
+    return campo('c', c[0], c[1], c[2], '<input class="input" id="c-' + c[0] + '" maxlength="120" autocomplete="off" value="' + esc(S.config[c[0]] || '') + '">');
+  }).join('') + '</div>';
+}
+function renderResponsables() {
+  var lista = S.responsables || [];
+  $('#lista-responsables').innerHTML = lista.length
+    ? lista.map(function (r) {
+        return '<li>' +
+          '<span class="nm"><b>' + esc(r.nombre || 'Responsable') + '</b> · <span class="muted">' + esc(r.email) + '</span></span>' +
+          '<button class="btn ghost icon sm" type="button" data-resp-edit="' + esc(r.id) + '" aria-label="Editar correo">' + ico('edit') + '</button>' +
+          '<button class="btn danger icon sm" type="button" data-resp-del="' + esc(r.id) + '" aria-label="Eliminar correo">' + ico('trash') + '</button>' +
+        '</li>';
+      }).join('')
+    : '<li class="muted">Todavía no hay correos configurados.</li>';
+
+  var logs = S.recordatorios || [];
+  var logEl = $('#log-recordatorios');
+  if (!logs.length) { logEl.innerHTML = ''; return; }
+  logEl.innerHTML = '<div class="hint" style="margin-bottom:6px"><b>Últimos recordatorios registrados:</b></div>' +
+    '<div style="display:flex;flex-direction:column;gap:4px">' + logs.slice(0, 5).map(function (l) {
+      return '<div style="font-size:12.5px;color:var(--mut);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">' +
+        '<span>' + esc(l.nombreCurso) + ' (' + esc(fmtFecha(l.fechaJornada)) + ')</span>' +
+        '<span>' + esc(l.estado) + ' · ' + esc(fmtHoraFull(l.fechaEnvio)) + '</span>' +
+      '</div>';
+    }).join('') + '</div>';
+}
+async function agregarResponsable(ev) {
+  ev.preventDefault();
+  if (UI.busy) return;
+  var nombre = ($('#resp-nombre').value || '').replace(/\s+/g, ' ').trim();
+  var email = ($('#resp-email').value || '').trim().toLowerCase();
+  if (!email || !/^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$/i.test(email)) {
+    toast('Ingresá un correo electrónico válido.', 'err');
+    $('#resp-email').focus();
+    return;
+  }
+  var r = await accion('guardarResponsable', [{ nombre: nombre, email: email }], $$('#form-resp button, #form-resp input'), $('#btn-resp-add'));
+  if (r.ok) { $('#resp-nombre').value = ''; $('#resp-email').value = ''; }
+}
+function abrirRespModal(id) {
+  var r = (S.responsables || []).filter(function (x) { return x.id === id; })[0];
+  if (!r) return;
+  UI.respCtx = r;
+  abrirModal(
+    '<div class="modal-h"><h3>Editar correo de responsable</h3><button class="x" type="button" data-act="cerrar" aria-label="Cerrar">' + ico('x') + '</button></div>' +
+    '<form id="form-resp-edit" novalidate><div class="modal-b"><div class="form-grid">' +
+      campo('re', 'nombre', 'Nombre', false, '<input class="input" id="re-nombre" maxlength="80" value="' + esc(r.nombre || '') + '">') +
+      campo('re', 'email', 'Correo electrónico', true, '<input class="input" id="re-email" type="email" maxlength="120" value="' + esc(r.email || '') + '">') +
+    '</div></div><div class="modal-f">' +
+      '<button class="btn ghost" type="button" data-act="cerrar">Cancelar</button>' +
+      '<button class="btn primary" type="submit" id="btn-re-guardar">' + ico('check') + 'Guardar</button>' +
+    '</div></form>'
+  );
+}
+async function guardarRespModal() {
+  var r = UI.respCtx; if (!r || UI.busy) return;
+  var nombre = $('#re-nombre').value.replace(/\s+/g, ' ').trim();
+  var email = $('#re-email').value.trim().toLowerCase();
+  if (!email || !/^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$/i.test(email)) {
+    mostrarErrores('re', { email: 'El correo electrónico no es válido.' });
+    return;
+  }
+  var res = await accion('guardarResponsable', [{ id: r.id, nombre: nombre, email: email }], $$('#modal-box button'), $('#btn-re-guardar'));
+  if (res.ok) cerrarModal(true);
+  else if (res.campo) { var o = {}; o[res.campo] = res.error; mostrarErrores('re', o); }
+}
+async function eliminarResponsableConfirm(id) {
+  var r = (S.responsables || []).filter(function (x) { return x.id === id; })[0];
+  if (!r || UI.busy) return;
+  var ok = await confirmar({
+    titulo: 'Eliminar responsable',
+    mensaje: '¿Quitar el correo <b>' + esc(r.email) + '</b> de la lista de recordatorios?',
+    ok: 'Sí, quitar',
+    peligro: true
+  });
+  if (!ok) return;
+  await accion('eliminarResponsable', [id], [], null);
+}
+
+function usoCategoria(c) {
+  return S.alumnos.filter(function (a) {
+    var tiene = (a.licencias || []).some(function (l) { return normCat(l.categoria) === normCat(c.nombre); });
+    return tiene || a.catActual === c.nombre || a.catSolicitada === c.nombre;
+  }).length;
+}
+function renderCategorias() {
+  $('#cfg-cats').innerHTML = GRUPOS_CAT.map(function (g) {
+    var lista = S.categorias.filter(function (c) { return c.tipo === g[0]; }).sort(function (a, b) { return (b.activo - a.activo) || COL.compare(a.nombre, b.nombre); });
+    return '<div class="card"><h3>' + esc(g[1]) + '</h3>' +
+      '<form class="cat-add" data-tipo="' + g[0] + '" novalidate><input class="input" maxlength="40" placeholder="Nueva categoría de licencia" autocomplete="off" aria-label="Nueva categoría de licencia"><button class="btn primary" type="submit">' + ico('plus') + 'Agregar</button></form>' +
+      '<ul class="cat-list">' + (lista.length ? lista.map(function (c) {
+        var u = usoCategoria(c);
+        return '<li><span class="nm' + (c.activo ? '' : ' off') + '">' + esc(c.nombre) + '</span><span class="us">' + u + (u === 1 ? ' alumno' : ' alumnos') + '</span>' +
+          '<span class="badge ' + (c.activo ? 'ok' : 'gray') + '">' + (c.activo ? 'Activa' : 'Inactiva') + '</span>' +
+          '<button class="btn ghost icon sm" type="button" data-cat-edit="' + esc(c.id) + '" aria-label="Renombrar">' + ico('edit') + '</button>' +
+          '<button class="btn ' + (c.activo ? 'danger' : 'ok') + ' icon sm" type="button" data-cat-toggle="' + esc(c.id) + '" aria-label="' + (c.activo ? 'Desactivar' : 'Activar') + '" title="' + (c.activo ? 'Desactivar' : 'Activar') + '">' + ico('power') + '</button></li>';
+      }).join('') : '<li class="muted">Sin categorías.</li>') + '</ul></div>';
+  }).join('');
+}
+async function agregarCategoria(form) {
+  var inp = $('input', form), nombre = inp.value.replace(/\s+/g, ' ').trim();
+  if (!nombre) { toast('Escribí el nombre de la categoría.', 'err'); inp.focus(); return; }
+  var r = await accion('guardarCategoria', [{ nombre: nombre, tipo: form.getAttribute('data-tipo') }], $$('button,input', form), $('button', form));
+  if (r.ok) inp.value = '';
+}
+function abrirCatModal(id) {
+  var c = S.categorias.filter(function (x) { return x.id === id; })[0]; if (!c) return;
+  UI.catCtx = c;
+  abrirModal('<div class="modal-h"><h3>Renombrar categoría</h3><button class="x" type="button" data-act="cerrar" aria-label="Cerrar">' + ico('x') + '</button></div>' +
+    '<form id="form-cat" novalidate><div class="modal-b"><div class="field" data-f="k-nombre"><label for="k-nombre">Nombre</label><input class="input" id="k-nombre" maxlength="40" autocomplete="off" value="' + esc(c.nombre) + '"><small class="err" data-err="k-nombre"></small>' +
+    '<span class="hint">Si la categoría ya está en uso, los registros existentes se actualizan al nuevo nombre.</span></div></div>' +
+    '<div class="modal-f"><button class="btn ghost" type="button" data-act="cerrar">Cancelar</button><button class="btn primary" type="submit" id="btn-cat-guardar">' + ico('check') + 'Guardar</button></div></form>');
+}
+async function guardarCatModal() {
+  var c = UI.catCtx; if (!c || UI.busy) return;
+  var nombre = $('#k-nombre').value.replace(/\s+/g, ' ').trim();
+  if (!nombre) { mostrarErrores('k', { nombre: 'Ingresá el nombre.' }); return; }
+  var r = await accion('guardarCategoria', [{ id: c.id, nombre: nombre, tipo: c.tipo }], $$('#modal-box button'), $('#btn-cat-guardar'));
+  if (r.ok) cerrarModal(true); else if (r.campo) mostrarErrores('k', { nombre: r.error });
+}
+async function alternarCategoria(id) {
+  var c = S.categorias.filter(function (x) { return x.id === id; })[0]; if (!c || UI.busy) return;
+  if (c.activo) {
+    var ok = await confirmar({ titulo: 'Desactivar categoría', mensaje: '¿Desactivar <b>' + esc(c.nombre) + '</b>? No aparecerá en nuevos registros, pero se conserva en el historial y podés reactivarla cuando quieras.', ok: 'Desactivar', peligro: true });
+    if (!ok) return;
+  }
+  await accion('cambiarEstadoCategoria', [{ id: id, activo: !c.activo }], [], null);
+}
+async function guardarEmpresa(ev) {
+  ev.preventDefault(); if (UI.busy) return;
+  var d = {}, e = {};
+  CAMPOS_EMPRESA.forEach(function (c) { d[c[0]] = $('#c-' + c[0]).value.replace(/\s+/g, ' ').trim(); });
+  if (!d.empresa_nombre) e.empresa_nombre = 'Ingresá el nombre de la empresa.';
+  if (d.empresa_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.empresa_email)) e.empresa_email = 'El correo no es válido.';
+  mostrarErrores('c', e);
+  if (Object.keys(e).length) { toast('Revisá los campos marcados en rojo.', 'err'); return; }
+  var r = await accion('guardarConfiguracion', [d], $$('#form-empresa button'), $('#btn-empresa'));
+  if (r.ok) { UI.empresaDirty = false; renderEmpresa(); }
+  else if (r.campo) { var o = {}; o[r.campo] = r.error; mostrarErrores('c', o); }
+}
+
+/* ======================= Eventos DOM ======================= */
+function conectar() {
+  $$('[data-ico]').forEach(function (el) { el.innerHTML = ico(el.getAttribute('data-ico')); });
+  $('#nav').addEventListener('click', function (e) { var b = e.target.closest('[data-view]'); if (b) go(b.getAttribute('data-view')); });
+  $('#burger').addEventListener('click', abrirMenu);
+  $('#backdrop').addEventListener('click', cerrarMenu);
+  $('#btn-refrescar').addEventListener('click', async function () {
+    if (UI.busy) return; UI.busy = true;
+    var r = await api('obtenerEstado'); UI.busy = false;
+    if (r.ok) { aplicarEstado(r.estado); toast('Datos actualizados.', 'ok'); cerrarMenu(); } else toast(r.error, 'err');
+  });
+
+  // Nuevo Alumno
+  $('#form-nuevo').addEventListener('submit', enviarNuevo);
+  $('#btn-limpiar').addEventListener('click', function () { limpiarNuevo(); });
+  $('#nuevo-campos').addEventListener('input', function (e) { if (e.target.id === 'n-dni') e.target.value = e.target.value.replace(/[^\d.]/g, ''); });
+  $('#nuevo-campos').addEventListener('change', function (e) {
+    if (e.target.type === 'checkbox') {
+      var lbl = e.target.closest('.lic-chk');
+      if (lbl) lbl.classList.toggle('checked', e.target.checked);
+    }
+  });
+
+  // Directorio Alumnos
+  $('#q-alumnos').addEventListener('input', function (e) { UI.q = e.target.value; renderLista(); });
+  $('#letters').addEventListener('click', function (e) { var b = e.target.closest('[data-letra]'); if (!b) return; UI.letra = b.getAttribute('data-letra'); UI.q = ''; $('#q-alumnos').value = ''; renderAlumnos(); });
+  $('#lista-alumnos').addEventListener('click', function (e) { var b = e.target.closest('[data-id]'); if (b) abrirFicha(b.getAttribute('data-id')); });
+
+  // Calendario de Eventos
+  $('#btn-nuevo-evento').addEventListener('click', function () { abrirEventoModal(null, UI.calSelectedDay || S.hoy); });
+  $('#cal-prev').addEventListener('click', function () {
+    UI.calMonth--; if (UI.calMonth < 1) { UI.calMonth = 12; UI.calYear--; }
+    renderCalendario();
+  });
+  $('#cal-next').addEventListener('click', function () {
+    UI.calMonth++; if (UI.calMonth > 12) { UI.calMonth = 1; UI.calYear++; }
+    renderCalendario();
+  });
+  $('#cal-hoy').addEventListener('click', function () {
+    if (S.hoy) {
+      UI.calYear = Number(S.hoy.substring(0, 4));
+      UI.calMonth = Number(S.hoy.substring(5, 7));
+      UI.calSelectedDay = S.hoy;
+    }
+    renderCalendario();
+  });
+  $('#ev-filtro').addEventListener('change', function (e) { UI.evFiltro = e.target.value; renderProximosEventos(); });
+  $('#view-calendario').addEventListener('click', function (e) {
+    var cell = e.target.closest('[data-cal-day]');
+    if (cell) {
+      var f = cell.getAttribute('data-cal-day');
+      UI.calSelectedDay = f;
+      UI.calYear = Number(f.substring(0, 4));
+      UI.calMonth = Number(f.substring(5, 7));
+      renderCalendario();
+      return;
+    }
+    var addFecha = e.target.closest('[data-add-ev-fecha]');
+    if (addFecha) { abrirEventoModal(null, addFecha.getAttribute('data-add-ev-fecha')); return; }
+    var vw = e.target.closest('[data-ev-view]');
+    if (vw) { abrirEventoDetalle(vw.getAttribute('data-ev-view')); return; }
+    var ed = e.target.closest('[data-ev-edit]');
+    if (ed) { abrirEventoModal(ed.getAttribute('data-ev-edit')); return; }
+    var del = e.target.closest('[data-ev-del]');
+    if (del) { eliminarEventoConfirm(del.getAttribute('data-ev-del')); }
+  });
+
+  // Configuración
+  $('#form-empresa').addEventListener('submit', guardarEmpresa);
+  $('#form-empresa').addEventListener('input', function () { UI.empresaDirty = true; });
+  $('#form-resp').addEventListener('submit', agregarResponsable);
+  $('#btn-prueba-mail').addEventListener('click', function () {
+    accion('enviarRecordatorioPrueba', [], [$('#btn-prueba-mail')], $('#btn-prueba-mail'));
+  });
+  $('#view-config').addEventListener('click', function (e) {
+    var ed = e.target.closest('[data-cat-edit]'), tg = e.target.closest('[data-cat-toggle]');
+    if (ed) { abrirCatModal(ed.getAttribute('data-cat-edit')); return; }
+    if (tg) { alternarCategoria(tg.getAttribute('data-cat-toggle')); return; }
+    var re = e.target.closest('[data-resp-edit]'), rd = e.target.closest('[data-resp-del]');
+    if (re) { abrirRespModal(re.getAttribute('data-resp-edit')); return; }
+    if (rd) { eliminarResponsableConfirm(rd.getAttribute('data-resp-del')); }
+  });
+  $('#cfg-cats').addEventListener('submit', function (e) { var f = e.target.closest('.cat-add'); if (f) { e.preventDefault(); agregarCategoria(f); } });
+
+  // Modal (delegado)
+  var mb = $('#modal-box');
+  mb.addEventListener('click', function (e) {
+    var delLic = e.target.closest('[data-lic-del]');
+    if (delLic) {
+      quitarLicenciaDePerfil(delLic.getAttribute('data-lic-del'), delLic.getAttribute('data-lic-name'));
+      return;
+    }
+    if (e.target.closest('#btn-add-jornada')) {
+      var list = $('#ev-jornadas-list');
+      if (list) list.insertAdjacentHTML('beforeend', filaJornadaModalHTML({ fecha: S.hoy }));
+      return;
+    }
+    var jDel = e.target.closest('.jor-del');
+    if (jDel) {
+      var rows = $$('#ev-jornadas-list .jornada-edit-row');
+      if (rows.length <= 1) { toast('El evento debe tener al menos una jornada.', 'err'); return; }
+      var row = jDel.closest('.jornada-edit-row');
+      if (row) row.remove();
+      return;
+    }
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var a = b.getAttribute('data-act');
+    if (a === 'cerrar') cerrarModal();
+    else if (a === 'editar') { UI.fichaEdit = true; renderFicha(); }
+    else if (a === 'cancelar') { if (UI.busy) return; UI.fichaEdit = false; renderFicha(); }
+    else if (a === 'eliminar') eliminarFicha();
+    else if (a === 'abrir-add-lic') { UI.mostrarAddLic = true; renderFicha(); }
+    else if (a === 'cancelar-add-lic') { UI.mostrarAddLic = false; renderFicha(); }
+    else if (a === 'ev-editar') { abrirEventoModal(UI.evId); }
+    else if (a === 'ev-eliminar') { eliminarEventoConfirm(UI.evId); }
+  });
+  mb.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (e.target.id === 'form-ficha') guardarFicha();
+    else if (e.target.id === 'form-add-lic') guardarNuevasLicencias();
+    else if (e.target.id === 'form-evento') guardarEventoForm();
+    else if (e.target.id === 'form-cat') guardarCatModal();
+    else if (e.target.id === 'form-resp-edit') guardarRespModal();
+  });
+  mb.addEventListener('change', function (e) {
+    if (e.target.type === 'checkbox') {
+      var lbl = e.target.closest('.lic-chk');
+      if (lbl) lbl.classList.toggle('checked', e.target.checked);
+    }
+  });
+  mb.addEventListener('input', function (e) { if (e.target.id === 'e-dni') e.target.value = e.target.value.replace(/[^\d.]/g, ''); });
+  $('#modal').addEventListener('mousedown', function (e) { if (e.target.id === 'modal') cerrarModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('#modal').classList.contains('open') && !$('#confirm').classList.contains('open')) cerrarModal(); });
+}
+
+/* ======================= Arranque ======================= */
+async function iniciar() {
+  inicializarLogos();
+  $('#boot-err').hidden = true; $('#boot-spin').hidden = false;
+  $('#boot-msg').textContent = 'Preparando tu espacio de trabajo…';
+  var r = await api('obtenerEstado');
+  if (!r.ok || !r.estado) {
+    $('#boot-spin').hidden = true;
+    $('#boot-msg').textContent = 'No se pudo iniciar la aplicación';
+    var be = $('#boot-err'); be.hidden = false;
+
+    var mostrarCfgUrl = !esModoGas();
+    var urlActual = obtenerApiUrl();
+    be.innerHTML = '<p style="max-width:440px;margin:0 auto 12px">' + esc(r.error || 'Error desconocido al cargar el estado.') + '</p>' +
+      (mostrarCfgUrl
+        ? '<div class="boot-config-card">' +
+            '<label for="boot-api-url">URL de la Web App de Google Apps Script (/exec)</label>' +
+            '<input class="input" id="boot-api-url" type="url" placeholder="https://script.google.com/macros/s/.../exec" value="' + esc(urlActual) + '">' +
+            '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
+              '<button class="btn primary sm" type="button" id="btn-guardar-url">Guardar URL y conectar</button>' +
+            '</div>' +
+          '</div>'
+        : '') +
+      '<div style="margin-top:12px"><button class="btn primary" type="button" id="btn-reintentar">Reintentar</button></div>';
+
+    $('#btn-reintentar').onclick = iniciar;
+    var btnUrl = $('#btn-guardar-url');
+    if (btnUrl) {
+      btnUrl.onclick = function () {
+        var val = ($('#boot-api-url').value || '').trim();
+        if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/i.test(val)) {
+          toast('Ingresá una URL válida terminada en /exec de Google Apps Script.', 'err');
+          return;
+        }
+        try { localStorage.setItem('survial_api_url', val); } catch (e) {}
+        iniciar();
+      };
+    }
+    return;
+  }
+
+  aplicarEstado(r.estado);
+  if (!window.__svListo) { conectar(); window.__svListo = true; }
+  $('#boot').hidden = true; $('#app').hidden = false;
+  renderCabecera();
+  go('inicio');
+}
+iniciar();
+})();
+</script>
+</body>
+</html>
